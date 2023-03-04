@@ -5,7 +5,11 @@ const isWindowDocumentAvailable = typeof window !== 'undefined';
 const isNavigatorObjectAvailable = typeof navigator !== 'undefined';
 
 // TODO:: Add polling
-export function useOnlineStatus() {
+export function useOnlineStatus(): {
+  error: unknown;
+  isOffline: boolean;
+  isOnline: boolean;
+} {
   const [isOnline, setIsOnline] = useState<boolean>(() =>
     isNavigatorObjectAvailable &&
     isWindowDocumentAvailable &&

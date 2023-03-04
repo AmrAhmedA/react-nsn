@@ -1,6 +1,89 @@
+:root {
+  --darkmode-color: #171717;
+  --link-color: #216fdb;
+  --main-icon-color: #bcc0c4;
+  --secondary-button-background: #e4e6eb;
+  --secondary-button-background-on-dark: rgba(0, 0, 0, 0.4);
+  --hover-overlay: rgba(0, 0, 0, 0.05);
+  --notifier-background-color: #ffffff;
+}
 .App {
   text-align: center;
   display: flex;
   align-items: center;
   flex-direction: column;
+}
+.statusModalAnchorOriginBottomLeft {
+  align-items: center;
+  background-color: var(--notifier-background-color);
+  border-radius: 8px;
+  bottom: 24px;
+  direction: ltr;
+  display: flex;
+  flex: 1 1 100px;
+  height: 48px;
+  justify-content: center;
+  left: 24px;
+  line-height: 16px;
+  padding: 16px 10px;
+  position: fixed;
+  text-align: left;
+  width: 320px;
+  z-index: 10000;
+  -webkit-box-align: center;
+  -webkit-box-pack: start;
+  -webkit-font-smoothing: antialiased;
+}
+
+.darkModeColor {
+  fill: var(--darkmode-color);
+}
+.mainColor {
+  fill: var(--main-icon-color);
+}
+.statusModalAnchorOriginBottomLeft div {
+  padding: 6px;
+}
+.statusModalAnchorOriginBottomLeft div:nth-child(1) {
+  box-sizing: border-box;
+  color: var(--darkmode-color);
+  pointer-events: all;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+.statusModalAnchorOriginBottomLeft div:nth-child(3) > span {
+  cursor: pointer;
+}
+.statusModalAnchorOriginBottomLeft div:nth-child(3) {
+  color: var(--link-color);
+  direction: ltr;
+  display: block;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 18px;
+  max-width: 100%;
+  min-width: 0px;
+  outline-color: var(--link-color);
+  overflow-wrap: break-word;
+  pointer-events: all;
+  text-align: left;
+  text-decoration: none solid var(--link-color) auto;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -ms-touch-action: manipulation;
+}
+
+.statusModalAnchorOriginBottomLeft div:nth-child(4) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: var(--hover-overlay);
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.statusModalAnchorOriginBottomLeft div:nth-child(4):hover {
+  background-color: var(--secondary-button-background);
 }
