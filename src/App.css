@@ -2,6 +2,7 @@
   --darkmode-color: #171717;
   --link-color: #216fdb;
   --main-icon-color: #bcc0c4;
+  --green-color: #00a400;
   --secondary-button-background: #e4e6eb;
   --secondary-button-background-on-dark: rgba(0, 0, 0, 0.4);
   --hover-overlay: rgba(0, 0, 0, 0.05);
@@ -37,6 +38,9 @@
 
 .darkModeColor {
   fill: var(--darkmode-color);
+}
+.onlineColor {
+  fill: var(--green-color);
 }
 .mainColor {
   fill: var(--main-icon-color);

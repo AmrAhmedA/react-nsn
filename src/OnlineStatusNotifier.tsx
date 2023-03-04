@@ -1,4 +1,4 @@
-import { cancelIcon, offlineIcon } from './icons';
+import { cancelIcon, offlineIcon, onlineIcon } from './icons';
 
 type OnlineStatusNotifierType = {
   isOnline: boolean;
@@ -12,7 +12,7 @@ export function OnlineStatusNotifier({ isOnline }: OnlineStatusNotifierType) {
 
   return (
     <div className="statusModalAnchorOriginBottomLeft">
-      <div>{offlineIcon}</div>
+      <div>{isOnline ? onlineIcon : offlineIcon}</div>
       <div>{getStatusText(isOnline)}</div>
       <div>
         <span onClick={handleRefreshButtonClick}>Refresh</span>
