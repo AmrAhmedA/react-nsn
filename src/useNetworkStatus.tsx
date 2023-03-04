@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { OnlineStatusNotifier } from './OnlineStatusNotifier';
 
 const isWindowDocumentAvailable = typeof window !== 'undefined';
 
@@ -9,6 +10,7 @@ export function useOnlineStatus(): {
   error: unknown;
   isOffline: boolean;
   isOnline: boolean;
+  StatusNotifierComponent: () => JSX.Element;
 } {
   const [isOnline, setIsOnline] = useState<boolean>(() =>
     isNavigatorObjectAvailable &&
@@ -37,9 +39,14 @@ export function useOnlineStatus(): {
     };
   }, []);
 
+  const StatusNotifierComponent = () => (
+    <OnlineStatusNotifier isOnline={isOnline} />
+  );
+
   return {
     error: null,
     isOffline: !isOnline,
-    isOnline
+    isOnline,
+    StatusNotifierComponent
   };
 }
