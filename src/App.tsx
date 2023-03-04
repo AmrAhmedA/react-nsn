@@ -1,5 +1,4 @@
 import './App.css';
-import { OnlineStatusNotifier } from './OnlineStatusNotifier';
 import { useOnlineStatus } from './useNetworkStatus';
 
 function App() {

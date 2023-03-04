@@ -25,5 +25,5 @@ export function OnlineStatusNotifier({ isOnline }: OnlineStatusNotifierType) {
 const getStatusText = (isOnline: boolean): string => {
   return isOnline
     ? 'Your internet connection was restored.'
-    : 'You are currently offline';
+    : 'You are currently offline.';
 };
