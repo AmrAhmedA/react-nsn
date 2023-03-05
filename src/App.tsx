@@ -1,5 +1,5 @@
 import './App.css';
-import { useOnlineStatus } from './useNetworkStatus';
+import { useOnlineStatus } from './useOnlineStatus';
 
 function App() {
   const { isOnline, StatusNotifierComponent } = useOnlineStatus();
