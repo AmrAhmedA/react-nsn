@@ -4,11 +4,11 @@ type OnlineStatusNotifierType = {
   isOnline: boolean;
 };
 export function OnlineStatusNotifier({ isOnline }: OnlineStatusNotifierType) {
+  const handleCloseButtonClick = () => {};
+
   const handleRefreshButtonClick = () =>
     // eslint-disable-next-line no-restricted-globals
     location.reload();
-
-  const handleCloseButtonClick = () => {};
 
   return (
     <div className="statusNotifierAnchorOriginBottomLeft">
