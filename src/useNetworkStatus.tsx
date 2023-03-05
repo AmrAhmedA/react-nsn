@@ -12,8 +12,6 @@ export function useOnlineStatus(): {
   isOnline: boolean;
   StatusNotifierComponent: () => JSX.Element | null;
 } {
-  let firstUpdate = useRef(true);
-
   const [isOnline, setIsOnline] = useState<boolean>(() =>
     isNavigatorObjectAvailable &&
     isWindowDocumentAvailable &&
@@ -21,6 +19,8 @@ export function useOnlineStatus(): {
       ? navigator.onLine
       : true
   );
+
+  const { isFirstRender } = useFirstRender(isOnline);
 
   // Reactive logic for detecting browser side online/offline
   useEffect(() => {
@@ -41,14 +41,8 @@ export function useOnlineStatus(): {
     };
   }, []);
 
-  useEffect(() => {
-    if (!isOnline) {
-      firstUpdate.current = false;
-    }
-  }, [isOnline]);
-
   const StatusNotifierComponent = () => {
-    if (firstUpdate.current && isOnline) return null;
+    if (isFirstRender && isOnline) return null;
     return <OnlineStatusNotifier isOnline={isOnline} />;
   };
 
@@ -59,3 +53,15 @@ export function useOnlineStatus(): {
     StatusNotifierComponent
   };
 }
+
+const useFirstRender = (isOnline: boolean): { isFirstRender: boolean } => {
+  let firstUpdate = useRef(true);
+
+  useEffect(() => {
+    if (!isOnline) {
+      firstUpdate.current = false;
+    }
+  }, [isOnline]);
+
+  return { isFirstRender: firstUpdate.current };
+};
