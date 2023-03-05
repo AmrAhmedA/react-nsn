@@ -11,12 +11,14 @@ export function OnlineStatusNotifier({ isOnline }: OnlineStatusNotifierType) {
   const handleCloseButtonClick = () => {};
 
   return (
-    <div className="statusModalAnchorOriginBottomLeft">
+    <div className="statusNotifierAnchorOriginBottomLeft">
       <div>{isOnline ? onlineIcon : offlineIcon}</div>
       <div>{getStatusText(isOnline)}</div>
-      <div>
-        <span onClick={handleRefreshButtonClick}>Refresh</span>
-      </div>
+      {!isOnline && (
+        <div>
+          <span onClick={handleRefreshButtonClick}>Refresh</span>
+        </div>
+      )}
       <div onClick={handleCloseButtonClick}>{cancelIcon}</div>
     </div>
   );

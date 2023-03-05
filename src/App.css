@@ -15,7 +15,7 @@
   flex-direction: column;
 }
 
-.statusModalAnchorOriginBottomLeft {
+.statusNotifierAnchorOriginBottomLeft {
   align-items: center;
   background-color: var(--notifier-background-color);
   border-radius: 8px;
@@ -45,10 +45,10 @@
 .mainColor {
   fill: var(--main-icon-color);
 }
-.statusModalAnchorOriginBottomLeft div {
+.statusNotifierAnchorOriginBottomLeft div {
   padding: 6px;
 }
-.statusModalAnchorOriginBottomLeft div:nth-child(1) {
+.statusNotifierAnchorOriginBottomLeft div:nth-child(1) {
   box-sizing: border-box;
   color: var(--darkmode-color);
   pointer-events: all;
@@ -56,10 +56,10 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.statusModalAnchorOriginBottomLeft div:nth-child(3) > span {
+.statusNotifierAnchorOriginBottomLeft div:nth-child(3) > span {
   cursor: pointer;
 }
-.statusModalAnchorOriginBottomLeft div:nth-child(3) {
+.statusNotifierAnchorOriginBottomLeft div:nth-child(3) {
   color: var(--link-color);
   direction: ltr;
   display: block;
@@ -78,7 +78,7 @@
   -ms-touch-action: manipulation;
 }
 
-.statusModalAnchorOriginBottomLeft div:nth-child(4) {
+.statusNotifierAnchorOriginBottomLeft div:last-child {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -88,6 +88,6 @@
   border-radius: 50%;
 }
 
-.statusModalAnchorOriginBottomLeft div:nth-child(4):hover {
+.statusNotifierAnchorOriginBottomLeft div:last-child:hover {
   background-color: var(--secondary-button-background);
 }
