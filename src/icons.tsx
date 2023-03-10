@@ -4,7 +4,7 @@ export const offlineIcon = (
   </svg>
 );
 
-export const cancelIcon = (
+export const closeIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="9.627"

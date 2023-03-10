@@ -7,6 +7,8 @@
   --secondary-button-background-on-dark: rgba(0, 0, 0, 0.4);
   --hover-overlay: rgba(0, 0, 0, 0.05);
   --notifier-background-color: #ffffff;
+  --enter-animation: cubic-bezier(0.14, 1, 0.34, 1);
+  --exit-animation: cubic-bezier(0.45, 0.1, 0.2, 1);
 }
 .App {
   text-align: center;
@@ -26,10 +28,11 @@
   justify-content: center;
   left: 24px;
   line-height: 16px;
-  padding: 16px 10px;
   min-width: 288;
+  padding: 16px 10px;
   position: fixed;
   text-align: left;
+  transform: scale(1);
   z-index: 10000;
   -webkit-box-align: center;
   -webkit-box-pack: start;
@@ -90,4 +93,40 @@
 
 .statusNotifierAnchorOriginBottomLeft div:last-child:hover {
   background-color: var(--secondary-button-background);
+}
+
+.fadeIn {
+  animation: fadeInBottomToTop 0.28s var(--enter-animation);
+  -webkit-animation: fadeInBottomToTop 0.28s var(--enter-animation);
+  -moz-animation: fadeInBottomToTop 0.28s var(--enter-animation);
+  -o-animation: fadeInBottomToTop 0.28s var(--enter-animation);
+  -ms-animation: fadeInBottomToTop 0.28s var(--enter-animation);
+}
+
+.fadeOut {
+  animation: fadeOutTopToBottom 0.28s var(--exit-animation);
+  -webkit-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
+  -moz-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
+  -o-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
+  -ms-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
+}
+
+@keyframes fadeOutTopToBottom {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(200%);
+  }
+}
+
+@keyframes fadeInBottomToTop {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+  }
 }
