@@ -23,6 +23,7 @@ export const OnlineStatusNotifier = forwardRef<
   ) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsOpen(false);
   };
 
   React.useImperativeHandle(ref, (): any => ({
@@ -34,7 +35,7 @@ export const OnlineStatusNotifier = forwardRef<
     location.reload();
 
   useEffect(() => {
-    if (!hovering && duration > 0 && isOpen) {
+    if (!hovering && duration > 0) {
       const timeout = setTimeout(() => {
         setIsOpen(false);
       }, duration * 1000);
@@ -43,7 +44,7 @@ export const OnlineStatusNotifier = forwardRef<
         clearTimeout(timeout);
       };
     }
-  }, [duration, hovering, isOpen]);
+  }, [duration, hovering]);
 
   return (
     <>
