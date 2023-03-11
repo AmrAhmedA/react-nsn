@@ -1,4 +1,5 @@
-import React, { forwardRef, useEffect } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
+import { CSSTransition } from 'react-transition-group';
 import { closeIcon, offlineIcon, onlineIcon } from './icons';
 
 type OnlineStatusNotifierType = {
@@ -9,6 +10,8 @@ export const OnlineStatusNotifier = forwardRef<
   HTMLDivElement,
   OnlineStatusNotifierType
 >((props, ref): any => {
+  const nodeRef = useRef(null);
+
   const { duration = 4.5, isOnline } = props;
 
   const [isOpen, setIsOpen] = React.useState(true);
@@ -31,7 +34,7 @@ export const OnlineStatusNotifier = forwardRef<
     location.reload();
 
   useEffect(() => {
-    if (!hovering && duration > 0) {
+    if (!hovering && duration > 0 && isOpen) {
       const timeout = setTimeout(() => {
         setIsOpen(false);
       }, duration * 1000);
@@ -40,35 +43,40 @@ export const OnlineStatusNotifier = forwardRef<
         clearTimeout(timeout);
       };
     }
-  }, [duration, hovering]);
-
-  const shouldRender = useDelayUnmount(isOpen, 210);
-
-  const fadeClass = isOpen ? 'fadeIn' : 'fadeOut';
-
-  if (!shouldRender) return null;
+  }, [duration, hovering, isOpen]);
 
   return (
-    <div
-      className={`statusNotifierAnchorOriginBottomLeft ${fadeClass}`}
-      ref={ref}
-      onMouseEnter={() => {
-        setHovering(true);
-      }}
-      onMouseLeave={() => {
-        setHovering(false);
-      }}
-    >
-      <div>{isOnline ? onlineIcon : offlineIcon}</div>
-      <div>{getStatusText(isOnline)}</div>
-      {!isOnline && (
-        <div>
-          <span onClick={handleRefreshButtonClick}>Refresh</span>
+    <>
+      <CSSTransition
+        in={isOpen}
+        timeout={260}
+        nodeRef={nodeRef}
+        appear={true}
+        classNames={'fade'}
+        unmountOnExit
+      >
+        <div
+          className={`statusNotifierAnchorOriginBottomLeft`}
+          ref={nodeRef}
+          onMouseEnter={() => {
+            setHovering(true);
+          }}
+          onMouseLeave={() => {
+            setHovering(false);
+          }}
+        >
+          <div>{isOnline ? onlineIcon : offlineIcon}</div>
+          <div>{getStatusText(isOnline)}</div>
+          {!isOnline && (
+            <div>
+              <span onClick={handleRefreshButtonClick}>Refresh</span>
+            </div>
+          )}
+          {/* close icon */}
+          <div onClick={handleCloseButtonClick}>{closeIcon}</div>
         </div>
-      )}
-      {/* close icon */}
-      <div onClick={handleCloseButtonClick}>{closeIcon}</div>
-    </div>
+      </CSSTransition>
+    </>
   );
 });
 
@@ -77,19 +85,3 @@ const getStatusText = (isOnline: boolean): string => {
     ? 'Your internet connection was restored.'
     : 'You are currently offline.';
 };
-
-function useDelayUnmount(isMounted: boolean, delayTime: number) {
-  const [shouldRender, setShouldRender] = React.useState(false);
-
-  useEffect(() => {
-    let timeoutId: any;
-    if (isMounted && !shouldRender) {
-      setShouldRender(true);
-    } else if (!isMounted && shouldRender) {
-      timeoutId = setTimeout(() => setShouldRender(false), delayTime);
-    }
-    return () => clearTimeout(timeoutId);
-  }, [isMounted, delayTime, shouldRender]);
-
-  return shouldRender;
-}

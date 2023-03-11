@@ -95,38 +95,31 @@
   background-color: var(--secondary-button-background);
 }
 
-.fadeIn {
-  animation: fadeInBottomToTop 0.28s var(--enter-animation);
-  -webkit-animation: fadeInBottomToTop 0.28s var(--enter-animation);
-  -moz-animation: fadeInBottomToTop 0.28s var(--enter-animation);
-  -o-animation: fadeInBottomToTop 0.28s var(--enter-animation);
-  -ms-animation: fadeInBottomToTop 0.28s var(--enter-animation);
+.fade-enter,
+.fade-appear {
+  opacity: 0;
+  transform: translateY(100%);
+}
+.fade-enter-active,
+.fade-appear-active {
+  opacity: 1;
+  transform: translateY(0%);
+  transition: opacity 260ms, transform 260ms var(--enter-animation);
+}
+.fade-enter-done {
+  opacity: 1;
+}
+.fade-exit {
+  opacity: 1;
+  transform: translateY(0%);
+}
+.fade-exit-active {
+  opacity: 0.3;
+  transform: translateY(200%);
+  transition: opacity 260ms, transform 260ms var(--exit-animation);
 }
 
-.fadeOut {
-  animation: fadeOutTopToBottom 0.28s var(--exit-animation);
-  -webkit-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
-  -moz-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
-  -o-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
-  -ms-animation: fadeOutTopToBottom 0.28s var(--exit-animation);
-}
-
-@keyframes fadeOutTopToBottom {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    transform: translateY(200%);
-  }
-}
-
-@keyframes fadeInBottomToTop {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-  }
+.fade-exit-done {
+  opacity: 0.3;
+  transform: translateY(200%);
 }
