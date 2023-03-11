@@ -41,10 +41,10 @@ export function useOnlineStatus(): {
     };
   }, []);
 
-  const StatusNotifierComponent = () => {
+  function StatusNotifierComponent() {
     if (isFirstRender && isOnline) return null;
     return <OnlineStatusNotifier isOnline={isOnline} />;
-  };
+  }
 
   return {
     error: null,
@@ -55,7 +55,7 @@ export function useOnlineStatus(): {
 }
 
 const useFirstRender = (isOnline: boolean): { isFirstRender: boolean } => {
-  let firstUpdate = useRef(true);
+  const firstUpdate = useRef(true);
 
   useEffect(() => {
     if (!isOnline) {
