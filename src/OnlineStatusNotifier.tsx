@@ -42,7 +42,7 @@ export const OnlineStatusNotifier = forwardRef<
     }
   }, [duration, hovering]);
 
-  const shouldRender = useDelayUnmount(isOpen, 280);
+  const shouldRender = useDelayUnmount(isOpen, 210);
 
   const fadeClass = isOpen ? 'fadeIn' : 'fadeOut';
 
