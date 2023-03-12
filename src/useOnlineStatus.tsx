@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react'
 
-const isWindowDocumentAvailable = typeof window !== 'undefined';
+const isWindowDocumentAvailable = typeof window !== 'undefined'
 
-const isNavigatorObjectAvailable = typeof navigator !== 'undefined';
+const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
 
 // TODO:: Add polling
 export function useOnlineStatus(): {
-  error: unknown;
-  isOffline: boolean;
-  isOnline: boolean;
-  isOpen: boolean;
-  isFirstRender: any;
-  toggleVisibility: (flag: boolean) => void;
+  error: unknown
+  isFirstRender: any
+  isOffline: boolean
+  isOnline: boolean
+  isOpen: boolean
+  toggleVisibility: (flag: boolean) => void
 } {
   const [isOnline, setIsOnline] = useState<boolean>(() =>
     isNavigatorObjectAvailable &&
@@ -19,34 +19,34 @@ export function useOnlineStatus(): {
     typeof navigator.onLine === 'boolean'
       ? navigator.onLine
       : true
-  );
+  )
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
-  const { isFirstRender } = useFirstRender(isOnline);
+  const { isFirstRender } = useFirstRender(isOnline)
 
-  const toggleVisibility = (flag: boolean) => setIsOpen(flag);
+  const toggleVisibility = (flag: boolean) => setIsOpen(flag)
 
   // Reactive logic for detecting browser side online/offline
   useEffect(() => {
     function setOnline() {
-      setIsOnline(true);
-      setIsOpen(true);
+      setIsOnline(true)
+      setIsOpen(true)
     }
 
     function setOffline() {
-      setIsOnline(false);
-      setIsOpen(true);
+      setIsOnline(false)
+      setIsOpen(true)
     }
 
-    window.addEventListener('online', setOnline);
-    window.addEventListener('offline', setOffline);
+    window.addEventListener('online', setOnline)
+    window.addEventListener('offline', setOffline)
 
     return () => {
-      window.removeEventListener('online', setOnline);
-      window.removeEventListener('offline', setOffline);
-    };
-  }, []);
+      window.removeEventListener('online', setOnline)
+      window.removeEventListener('offline', setOffline)
+    }
+  }, [])
 
   return {
     error: null,
@@ -55,17 +55,17 @@ export function useOnlineStatus(): {
     isOpen,
     isFirstRender,
     toggleVisibility
-  };
+  }
 }
 
 const useFirstRender = (isOnline: boolean): { isFirstRender: boolean } => {
-  const firstUpdate = useRef(true);
+  const firstUpdate = useRef(true)
 
   useEffect(() => {
     if (firstUpdate.current) {
-      firstUpdate.current = false;
+      firstUpdate.current = false
     }
-  }, [isOnline]);
+  }, [isOnline])
 
-  return { isFirstRender: firstUpdate.current };
-};
+  return { isFirstRender: firstUpdate.current }
+}
