@@ -1,50 +1,57 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
-import { CSSTransition } from 'react-transition-group';
+import React, { forwardRef, useEffect } from 'react';
+import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { closeIcon, offlineIcon, onlineIcon } from './icons';
+import { useOnlineStatus } from './useOnlineStatus';
 
 type OnlineStatusNotifierType = {
-  isOnline: boolean;
   duration?: number;
 };
 export const OnlineStatusNotifier = forwardRef<
   HTMLDivElement,
   OnlineStatusNotifierType
 >((props, ref): any => {
-  const nodeRef = useRef(null);
+  const { isOnline, isOpen, toggleVisibility, isFirstRender } =
+    useOnlineStatus();
 
-  const { duration = 4.5, isOnline } = props;
-
-  const [isOpen, setIsOpen] = React.useState(true);
+  const { duration = 4.5 } = props;
 
   const [hovering, setHovering] = React.useState(false);
+
+  const onlineRef = React.useRef(null);
+  const offlineRef = React.useRef(null);
+
+  const nodeRef: any = isOnline ? onlineRef : offlineRef;
 
   const handleCloseButtonClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsOpen(false);
+    toggleVisibility(false);
   };
 
   React.useImperativeHandle(ref, (): any => ({
     onClose: () => null
   }));
 
-  const handleRefreshButtonClick = () =>
-    // eslint-disable-next-line no-restricted-globals
-    location.reload();
-
   useEffect(() => {
-    if (!hovering && duration > 0) {
+    if (!hovering && duration > 0 && isOpen) {
       const timeout = setTimeout(() => {
-        setIsOpen(false);
+        toggleVisibility(false);
       }, duration * 1000);
 
       return () => {
         clearTimeout(timeout);
       };
     }
-  }, [duration, hovering]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duration, hovering, isOpen]);
+
+  const handleRefreshButtonClick = () =>
+    // eslint-disable-next-line no-restricted-globals
+    location.reload();
+
+  if (isFirstRender && isOnline) return null;
 
   return (
     <>
@@ -54,28 +61,38 @@ export const OnlineStatusNotifier = forwardRef<
         nodeRef={nodeRef}
         appear={true}
         classNames={'fade'}
-        unmountOnExit
       >
-        <div
-          className={`statusNotifierAnchorOriginBottomLeft`}
-          ref={nodeRef}
-          onMouseEnter={() => {
-            setHovering(true);
-          }}
-          onMouseLeave={() => {
-            setHovering(false);
-          }}
-        >
-          <div>{isOnline ? onlineIcon : offlineIcon}</div>
-          <div>{getStatusText(isOnline)}</div>
-          {!isOnline && (
-            <div>
-              <span onClick={handleRefreshButtonClick}>Refresh</span>
+        <SwitchTransition mode={'out-in'}>
+          <CSSTransition
+            key={isOnline as any}
+            nodeRef={nodeRef}
+            addEndListener={(done: any) => {
+              nodeRef.current.addEventListener('transitionend', done, false);
+            }}
+            classNames="fade"
+          >
+            <div
+              className={`statusNotifierAnchorOriginBottomLeft`}
+              ref={nodeRef}
+              onMouseEnter={() => {
+                setHovering(true);
+              }}
+              onMouseLeave={() => {
+                setHovering(false);
+              }}
+            >
+              <div>{isOnline ? onlineIcon : offlineIcon}</div>
+              <div>{getStatusText(isOnline)}</div>
+              {!isOnline && (
+                <div>
+                  <span onClick={handleRefreshButtonClick}>Refresh</span>
+                </div>
+              )}
+              {/* close icon */}
+              <div onClick={handleCloseButtonClick}>{closeIcon}</div>
             </div>
-          )}
-          {/* close icon */}
-          <div onClick={handleCloseButtonClick}>{closeIcon}</div>
-        </div>
+          </CSSTransition>
+        </SwitchTransition>
       </CSSTransition>
     </>
   );

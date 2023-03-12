@@ -120,6 +120,5 @@
 }
 
 .fade-exit-done {
-  opacity: 0.3;
-  transform: translateY(200%);
+  opacity: 0;
 }
