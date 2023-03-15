@@ -61,6 +61,7 @@ export const OnlineStatusNotifier = forwardRef<
         nodeRef={nodeRef}
         appear={true}
         classNames={'fade'}
+        unmountOnExit
       >
         <SwitchTransition mode={'out-in'}>
           <CSSTransition
