@@ -18,7 +18,10 @@ export const OnlineStatusNotifier = forwardRef<
   const [hovering, setHovering] = React.useState(false)
 
   const onlineRef = React.useRef(null)
+
   const offlineRef = React.useRef(null)
+
+  const timeoutRef: any = React.useRef(null)
 
   const nodeRef: any = isOnline ? onlineRef : offlineRef
 
@@ -31,21 +34,24 @@ export const OnlineStatusNotifier = forwardRef<
   }
 
   React.useImperativeHandle(ref, (): any => ({
-    onClose: () => null
+    onlineChange: () => clearTimeout(timeoutRef.current)
   }))
 
   useEffect(() => {
+    const cleanupFn = () => clearTimeout(timeoutRef.current)
+    // clear timeout between transitions
+    if (timeoutRef.current) cleanupFn
+
     if (!hovering && duration > 0 && isOpen) {
-      const timeout = setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         toggleVisibility(false)
       }, duration * 1000)
 
-      return () => {
-        clearTimeout(timeout)
-      }
+      return cleanupFn
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [duration, hovering, isOpen])
+  }, [duration, hovering, isOpen, isOnline])
 
   const handleRefreshButtonClick = () =>
     // eslint-disable-next-line no-restricted-globals
