@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect } from 'react'
 import { CSSTransition, SwitchTransition } from 'react-transition-group'
+import { useFirstRender, useOnlineStatus } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
-import { useOnlineStatus } from './useOnlineStatus'
 
 type OnlineStatusNotifierType = {
   duration?: number
@@ -10,20 +10,25 @@ export const OnlineStatusNotifier = forwardRef<
   HTMLDivElement,
   OnlineStatusNotifierType
 >((props, ref): any => {
-  const { isOnline, isOpen, toggleVisibility, isFirstRender } =
-    useOnlineStatus()
+  const [isOpen, setIsOpen] = React.useState(false)
 
   const { duration = 4.5 } = props
 
   const [hovering, setHovering] = React.useState(false)
 
-  const onlineRef = React.useRef(null)
+  const onlineRef = React.useRef<HTMLDivElement>(null)
 
-  const offlineRef = React.useRef(null)
+  const offlineRef = React.useRef<HTMLDivElement>(null)
 
   const timeoutRef: any = React.useRef(null)
 
-  const nodeRef: any = isOnline ? onlineRef : offlineRef
+  const toggleVisibility = (flag: boolean) => setIsOpen(flag)
+
+  const { isOnline } = useOnlineStatus({ toggleVisibility })
+
+  const { isFirstRender } = useFirstRender()
+
+  const nodeRef = isOnline ? onlineRef : offlineRef
 
   const handleCloseButtonClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -34,11 +39,12 @@ export const OnlineStatusNotifier = forwardRef<
   }
 
   React.useImperativeHandle(ref, (): any => ({
-    onlineChange: () => clearTimeout(timeoutRef.current)
+    openStatus: () => toggleVisibility(true)
   }))
 
   useEffect(() => {
-    const cleanupFn = () => clearTimeout(timeoutRef.current)
+    const cleanupFn = () =>
+      timeoutRef.current && clearTimeout(timeoutRef.current)
     // clear timeout between transitions
     if (timeoutRef.current) cleanupFn
 
@@ -73,8 +79,8 @@ export const OnlineStatusNotifier = forwardRef<
           <CSSTransition
             key={isOnline as any}
             nodeRef={nodeRef}
-            addEndListener={(done: any) => {
-              nodeRef.current.addEventListener('transitionend', done, false)
+            addEndListener={(done: () => void) => {
+              nodeRef.current?.addEventListener('transitionend', done, false)
             }}
             classNames='fade'
           >
