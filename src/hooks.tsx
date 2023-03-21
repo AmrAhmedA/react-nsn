@@ -14,11 +14,7 @@ const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 // TODO:: Add polling
-function useOnlineStatus({
-  toggleVisibility
-}: {
-  toggleVisibility: (flag: boolean) => void
-}): {
+function useOnlineStatus(): {
   error: unknown
   isOffline: boolean
   isOnline: boolean
@@ -31,13 +27,9 @@ function useOnlineStatus({
       : true
   )
 
-  const handleOnlineStatus = useCallback(
-    ({ type }: Event) => {
-      setIsOnline(type === 'online')
-      toggleVisibility(true)
-    },
-    [toggleVisibility]
-  )
+  const handleOnlineStatus = useCallback(({ type }: Event) => {
+    setIsOnline(type === 'online')
+  }, [])
 
   // Reactive logic for detecting browser side online/offline
   useEffect(() => {

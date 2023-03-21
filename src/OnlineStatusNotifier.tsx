@@ -22,13 +22,13 @@ export const OnlineStatusNotifier = forwardRef<
 
   const timeoutRef: any = React.useRef(null)
 
-  const toggleVisibility = (flag: boolean) => setIsOpen(flag)
-
-  const { isOnline } = useOnlineStatus({ toggleVisibility })
+  const { isOnline } = useOnlineStatus()
 
   const { isFirstRender } = useFirstRender()
 
   const nodeRef = isOnline ? onlineRef : offlineRef
+
+  const toggleVisibility = (flag: boolean) => setIsOpen(flag)
 
   const handleCloseButtonClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -41,6 +41,10 @@ export const OnlineStatusNotifier = forwardRef<
   React.useImperativeHandle(ref, (): any => ({
     openStatus: () => toggleVisibility(true)
   }))
+
+  useEffect(() => {
+    if (!isFirstRender) return toggleVisibility(true)
+  }, [isOnline, isFirstRender])
 
   useEffect(() => {
     const cleanupFn = () =>
