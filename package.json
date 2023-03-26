@@ -14,24 +14,27 @@
     "prettier": "^2.8.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
     "react-transition-group": "^4.4.5",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "parcel public/index.html -p 3000",
+    "prebuild": "rm -rf dist/",
+    "build": "parcel build public/index.html",
     "type-check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "prepare": "husky install",
-    "format": "prettier --write src"
+    "format": "prettier --write src",
+    "pre-commit": "lint-staged"
   },
   "lint-staged": {
     "*.@(js|json|ts|tsx)": [
+      "npm run format",
       "npm run lint"
+    ],
+    "*.@(ts|tsx)": [
+      "npm run type-check"
     ]
   },
   "browserslist": {
@@ -47,6 +50,8 @@
     ]
   },
   "devDependencies": {
+    "@parcel/packager-raw-url": "^2.8.3",
+    "@parcel/transformer-webmanifest": "^2.8.3",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
     "eslint": "^8.36.0",
@@ -54,6 +59,9 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
-    "prettier-plugin-organize-imports": "^3.2.2"
+    "lint-staged": "^13.2.0",
+    "parcel": "^2.8.3",
+    "prettier-plugin-organize-imports": "^3.2.2",
+    "process": "^0.11.10"
   }
 }
