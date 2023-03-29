@@ -13,8 +13,7 @@ const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-// TODO:: Add polling
-function useOnlineStatus(): {
+function useOnlineStatus(pollingUrl = 'https://www.gstatic.com/generate_204'): {
   error: unknown
   isOffline: boolean
   isOnline: boolean
@@ -26,6 +25,12 @@ function useOnlineStatus(): {
       ? navigator.onLine
       : true
   )
+
+  useInterval(async () => {
+    await fetch(pollingUrl, { mode: 'no-cors' })
+      .then((response) => response && !isOnline && setIsOnline(true))
+      .catch(() => setIsOnline(false))
+  }, 6000)
 
   const handleOnlineStatus = useCallback(({ type }: Event) => {
     setIsOnline(type === 'online')
@@ -47,6 +52,24 @@ function useOnlineStatus(): {
     isOffline: !isOnline,
     isOnline
   }
+}
+
+export function useInterval(callback: () => void, delay: number | null) {
+  const savedCallback = useRef<() => void | null>()
+
+  useEffect(() => {
+    savedCallback.current = callback
+  }, [callback])
+
+  useEffect(() => {
+    function tick() {
+      savedCallback.current()
+    }
+    if (delay !== null) {
+      const id = setInterval(tick, delay)
+      return () => clearInterval(id)
+    }
+  }, [delay])
 }
 
 function useFirstRender(): { isFirstRender: boolean } {
