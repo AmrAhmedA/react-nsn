@@ -13,7 +13,10 @@ const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-function useOnlineStatus(pollingUrl = 'https://www.gstatic.com/generate_204'): {
+function useOnlineStatus(
+  pollingUrl = 'https://www.gstatic.com/generate_204',
+  pollingDuration = 2000
+): {
   error: unknown
   isOffline: boolean
   isOnline: boolean
@@ -25,16 +28,31 @@ function useOnlineStatus(pollingUrl = 'https://www.gstatic.com/generate_204'): {
       ? navigator.onLine
       : true
   )
+  const prevOnlineState = useRef<boolean>()
 
-  useInterval(async () => {
-    await fetch(pollingUrl, { mode: 'no-cors' })
-      .then((response) => response && !isOnline && setIsOnline(true))
-      .catch(() => setIsOnline(false))
-  }, 6000)
+  useEffect(() => {
+    prevOnlineState.current = isOnline
+  }, [isOnline])
 
-  const handleOnlineStatus = useCallback(({ type }: Event) => {
-    setIsOnline(type === 'online')
-  }, [])
+  const _onlineStatusFn = useCallback(
+    async () =>
+      await fetch(pollingUrl, { mode: 'no-cors' })
+        .then(
+          (response) =>
+            response && !prevOnlineState.current && setIsOnline(true)
+        )
+        .catch(() => setIsOnline(false)),
+    [pollingUrl]
+  )
+
+  useInterval(_onlineStatusFn, pollingDuration)
+
+  const handleOnlineStatus = useCallback(
+    async ({ type }: Event) => {
+      type === 'online' ? _onlineStatusFn() : setIsOnline(false)
+    },
+    [_onlineStatusFn]
+  )
 
   // Reactive logic for detecting browser side online/offline
   useEffect(() => {
@@ -54,7 +72,10 @@ function useOnlineStatus(pollingUrl = 'https://www.gstatic.com/generate_204'): {
   }
 }
 
-export function useInterval(callback: () => void, delay: number | null) {
+export function useInterval(
+  callback: () => Promise<void>,
+  delay: number | null
+) {
   const savedCallback = useRef<() => void | null>()
 
   useEffect(() => {
