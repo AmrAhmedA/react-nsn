@@ -3,16 +3,42 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import { useFirstRender, useOnlineStatus } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
 
-type OnlineStatusNotifierType = {
-  duration?: number
+type StatusText = {
+  online?: string
+  offline?: string
 }
+
+type Position = 'bottomLeft' | 'bottomRight' | 'centered'
+
+type EventsCallback = {
+  onRefreshClick: () => void
+  onCloseClick: () => void
+}
+
+interface OnlineStatusNotifierType {
+  destoryOnClose?: boolean
+  duration?: number
+  eventsCallback?: EventsCallback
+  position?: Position
+  statusText?: StatusText
+}
+
+const DefaultOnlineText = 'Your internet connection was restored.'
+const DefaultOfflineText = 'You are currently offline.'
+
 export const OnlineStatusNotifier = forwardRef<
   HTMLDivElement,
   OnlineStatusNotifierType
 >((props, ref): any => {
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const { duration = 4.5 } = props
+  const {
+    destoryOnClose = true,
+    duration = 4.5,
+    eventsCallback,
+    position = 'bottomLeft',
+    statusText
+  } = props
 
   const [hovering, setHovering] = React.useState(false)
 
@@ -20,7 +46,7 @@ export const OnlineStatusNotifier = forwardRef<
 
   const offlineRef = React.useRef<HTMLDivElement>(null)
 
-  const timeoutRef: any = React.useRef(null)
+  const timeoutRef = React.useRef(null)
 
   const { isOnline } = useOnlineStatus()
 
@@ -29,14 +55,6 @@ export const OnlineStatusNotifier = forwardRef<
   const nodeRef = isOnline ? onlineRef : offlineRef
 
   const toggleVisibility = (flag: boolean) => setIsOpen(flag)
-
-  const handleCloseButtonClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    e.preventDefault()
-    e.stopPropagation()
-    toggleVisibility(false)
-  }
 
   React.useImperativeHandle(ref, (): any => ({
     openStatus: () => toggleVisibility(true)
@@ -49,8 +67,6 @@ export const OnlineStatusNotifier = forwardRef<
   useEffect(() => {
     const cleanupFn = () =>
       timeoutRef.current && clearTimeout(timeoutRef.current)
-    // clear timeout between transitions
-    if (timeoutRef.current) cleanupFn
 
     if (!hovering && duration > 0 && isOpen) {
       timeoutRef.current = setTimeout(() => {
@@ -62,9 +78,21 @@ export const OnlineStatusNotifier = forwardRef<
     // eslint-disable-next-line no-restricted-globals
   }, [duration, hovering, isOpen, isOnline])
 
-  const handleRefreshButtonClick = () =>
+  const handleRefreshButtonClick = () => {
     // eslint-disable-next-line no-restricted-globals
-    location.reload()
+    eventsCallback.onRefreshClick
+      ? eventsCallback.onRefreshClick()
+      : location.reload()
+  }
+
+  const handleCloseButtonClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    e.preventDefault()
+    e.stopPropagation()
+    eventsCallback.onCloseClick && eventsCallback.onCloseClick()
+    toggleVisibility(false)
+  }
 
   if (isFirstRender && isOnline) return null
 
@@ -76,11 +104,11 @@ export const OnlineStatusNotifier = forwardRef<
         nodeRef={nodeRef}
         appear={true}
         classNames={'fade'}
-        unmountOnExit
+        unmountOnExit={destoryOnClose}
       >
         <SwitchTransition mode={'out-in'}>
           <CSSTransition
-            key={isOnline as any}
+            key={isOnline ? 'Online' : 'Offline'}
             nodeRef={nodeRef}
             addEndListener={(done: () => void) => {
               nodeRef.current?.addEventListener('transitionend', done, false)
@@ -88,7 +116,7 @@ export const OnlineStatusNotifier = forwardRef<
             classNames='fade'
           >
             <div
-              className={`statusNotifierAnchorOriginBottomLeft`}
+              className={getNotificationCls(position)}
               ref={nodeRef}
               onMouseEnter={() => {
                 setHovering(true)
@@ -100,7 +128,8 @@ export const OnlineStatusNotifier = forwardRef<
               <div className='statusNotificationIcon'>
                 {isOnline ? onlineIcon : offlineIcon}
               </div>
-              <div>{getStatusText(isOnline)}</div>
+              <div>{getStatusText(isOnline, statusText)}</div>
+              {/* refresh link */}
               {!isOnline && (
                 <div className='statusNotificationRefresh'>
                   <span onClick={handleRefreshButtonClick}>Refresh</span>
@@ -121,8 +150,21 @@ export const OnlineStatusNotifier = forwardRef<
   )
 })
 
-const getStatusText = (isOnline: boolean): string => {
-  return isOnline
-    ? 'Your internet connection was restored.'
-    : 'You are currently offline.'
+const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
+  isOnline
+    ? statusText?.online ?? DefaultOnlineText
+    : statusText?.offline ?? DefaultOfflineText
+
+const getNotificationCls = (position: Position): string => {
+  const defaultCls = `statusNotification`
+  switch (position) {
+    case 'bottomLeft':
+      return `${defaultCls} AnchorOriginBottomLeft`
+    case 'bottomRight':
+      return `${defaultCls} AnchorOriginBottomRight`
+    case 'centered':
+      return `${defaultCls}`
+    default:
+      return `${defaultCls} AnchorOriginBottomLeft`
+  }
 }

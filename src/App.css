@@ -17,7 +17,7 @@
   flex-direction: column;
 }
 
-.statusNotifierAnchorOriginBottomLeft {
+.statusNotification {
   align-items: center;
   background-color: var(--notifier-background-color);
   border-radius: 8px;
@@ -26,7 +26,6 @@
   display: flex;
   height: 48px;
   justify-content: center;
-  left: 24px;
   line-height: 16px;
   min-width: 288;
   padding: 16px 10px;
@@ -38,7 +37,13 @@
   -webkit-box-pack: start;
   -webkit-font-smoothing: antialiased;
 }
+.AnchorOriginBottomLeft {
+  left: 24px;
+}
 
+.AnchorOriginBottomRight {
+  right: 24px;
+}
 .darkModeColor {
   fill: var(--darkmode-color);
 }
@@ -48,10 +53,10 @@
 .mainColor {
   fill: var(--main-icon-color);
 }
-.statusNotifierAnchorOriginBottomLeft div {
+.statusNotification div {
   padding: 6px;
 }
-.statusNotifierAnchorOriginBottomLeft > .statusNotificationIcon {
+.statusNotification > .statusNotificationIcon {
   box-sizing: border-box;
   color: var(--darkmode-color);
   pointer-events: all;
@@ -59,10 +64,10 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.statusNotifierAnchorOriginBottomLeft > .statusNotificationRefresh > span {
+.statusNotification > .statusNotificationRefresh > span {
   cursor: pointer;
 }
-.statusNotifierAnchorOriginBottomLeft > .statusNotificationRefresh {
+.statusNotification > .statusNotificationRefresh {
   color: var(--link-color);
   direction: ltr;
   display: block;
@@ -81,7 +86,7 @@
   -ms-touch-action: manipulation;
 }
 
-.statusNotifierAnchorOriginBottomLeft > .statusNotificationCloseIcon {
+.statusNotification > .statusNotificationCloseIcon {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -91,7 +96,7 @@
   border-radius: 50%;
 }
 
-.statusNotifierAnchorOriginBottomLeft > .statusNotificationCloseIcon:hover {
+.statusNotification > .statusNotificationCloseIcon:hover {
   background-color: var(--secondary-button-background);
 }
 
