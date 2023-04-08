@@ -59,8 +59,7 @@ export const OnlineStatusNotifier = forwardRef<
 
       return cleanupFn
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line no-restricted-globals
   }, [duration, hovering, isOpen, isOnline])
 
   const handleRefreshButtonClick = () =>
@@ -98,15 +97,22 @@ export const OnlineStatusNotifier = forwardRef<
                 setHovering(false)
               }}
             >
-              <div>{isOnline ? onlineIcon : offlineIcon}</div>
+              <div className='statusNotificationIcon'>
+                {isOnline ? onlineIcon : offlineIcon}
+              </div>
               <div>{getStatusText(isOnline)}</div>
               {!isOnline && (
-                <div>
+                <div className='statusNotificationRefresh'>
                   <span onClick={handleRefreshButtonClick}>Refresh</span>
                 </div>
               )}
               {/* close icon */}
-              <div onClick={handleCloseButtonClick}>{closeIcon}</div>
+              <div
+                className='statusNotificationCloseIcon'
+                onClick={handleCloseButtonClick}
+              >
+                {closeIcon}
+              </div>
             </div>
           </CSSTransition>
         </SwitchTransition>

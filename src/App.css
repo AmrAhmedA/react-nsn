@@ -51,7 +51,7 @@
 .statusNotifierAnchorOriginBottomLeft div {
   padding: 6px;
 }
-.statusNotifierAnchorOriginBottomLeft div:nth-child(1) {
+.statusNotifierAnchorOriginBottomLeft > .statusNotificationIcon {
   box-sizing: border-box;
   color: var(--darkmode-color);
   pointer-events: all;
@@ -59,10 +59,10 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.statusNotifierAnchorOriginBottomLeft div:nth-child(3) > span {
+.statusNotifierAnchorOriginBottomLeft > .statusNotificationRefresh > span {
   cursor: pointer;
 }
-.statusNotifierAnchorOriginBottomLeft div:nth-child(3) {
+.statusNotifierAnchorOriginBottomLeft > .statusNotificationRefresh {
   color: var(--link-color);
   direction: ltr;
   display: block;
@@ -81,7 +81,7 @@
   -ms-touch-action: manipulation;
 }
 
-.statusNotifierAnchorOriginBottomLeft div:last-child {
+.statusNotifierAnchorOriginBottomLeft > .statusNotificationCloseIcon {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -91,7 +91,7 @@
   border-radius: 50%;
 }
 
-.statusNotifierAnchorOriginBottomLeft div:last-child:hover {
+.statusNotifierAnchorOriginBottomLeft > .statusNotificationCloseIcon:hover {
   background-color: var(--secondary-button-background);
 }
 

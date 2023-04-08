@@ -15,7 +15,7 @@ const useIsomorphicLayoutEffect =
 
 function useOnlineStatus(
   pollingUrl = 'https://www.gstatic.com/generate_204',
-  pollingDuration = 2000
+  pollingDuration = 20000
 ): {
   error: unknown
   isOffline: boolean
