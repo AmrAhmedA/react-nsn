@@ -24,7 +24,8 @@
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "prepare": "husky install",
     "format": "prettier --write src",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "clean": "rimraf dist && rimraf --glob node_modules"
   },
   "lint-staged": {
     "*.@(js|json|ts|tsx)": [
@@ -58,6 +59,7 @@
     "prettier": "^2.8.7",
     "prettier-plugin-organize-imports": "^3.2.2",
     "process": "^0.11.10",
+    "rimraf": "^5.0.0",
     "typescript": "^5.0.4"
   }
 }
