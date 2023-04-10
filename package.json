@@ -2,6 +2,17 @@
   "name": "react-online-status",
   "version": "0.1.0",
   "private": true,
+  "description": "A very lightweight and customizable online network status notification built for react apps.",
+  "keywords": [
+    "react",
+    "notification",
+    "status",
+    "online-status",
+    "network-status",
+    "online-status-notification",
+    "network-notification",
+    "network-notifier"
+  ],
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
