@@ -9,7 +9,6 @@ export const closeIcon = (
     xmlns='http://www.w3.org/2000/svg'
     width='9.627'
     height='9.632'
-    className={'darkModeColor'}
     viewBox='0 0 9.627 9.632'
   >
     <path

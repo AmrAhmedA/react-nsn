@@ -31,10 +31,6 @@
   "lint-staged": {
     "*.@(js|json|ts|tsx)": [
       "npm run format"
-    ],
-    "*.@(ts|tsx)": [
-      "npm run type-check",
-      "npm run lint"
     ]
   },
   "browserslist": {

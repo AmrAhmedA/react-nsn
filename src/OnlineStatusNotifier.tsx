@@ -16,6 +16,7 @@ type EventsCallback = {
 }
 
 interface OnlineStatusNotifierType {
+  darkMode?: boolean
   destoryOnClose?: boolean
   duration?: number
   eventsCallback?: EventsCallback
@@ -29,10 +30,11 @@ const DefaultOfflineText = 'You are currently offline.'
 export const OnlineStatusNotifier = forwardRef<
   HTMLDivElement,
   OnlineStatusNotifierType
->((props, ref): any => {
+>((props, ref): JSX.Element => {
   const [isOpen, setIsOpen] = React.useState(false)
 
   const {
+    darkMode = false,
     destoryOnClose = true,
     duration = 4.5,
     eventsCallback,
@@ -90,7 +92,7 @@ export const OnlineStatusNotifier = forwardRef<
   ) => {
     e.preventDefault()
     e.stopPropagation()
-    eventsCallback.onCloseClick && eventsCallback.onCloseClick()
+    eventsCallback?.onCloseClick && eventsCallback.onCloseClick()
     toggleVisibility(false)
   }
 
@@ -116,7 +118,7 @@ export const OnlineStatusNotifier = forwardRef<
             classNames='fade'
           >
             <div
-              className={getNotificationCls(position)}
+              className={getNotificationCls(position, darkMode)}
               ref={nodeRef}
               onMouseEnter={() => {
                 setHovering(true)
@@ -137,7 +139,9 @@ export const OnlineStatusNotifier = forwardRef<
               )}
               {/* close icon */}
               <div
-                className='statusNotificationCloseIcon'
+                className={`statusNotificationCloseIcon ${
+                  darkMode ? 'darkColor' : 'defaultColor'
+                }`}
                 onClick={handleCloseButtonClick}
               >
                 {closeIcon}
@@ -155,16 +159,18 @@ const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
     ? statusText?.online ?? DefaultOnlineText
     : statusText?.offline ?? DefaultOfflineText
 
-const getNotificationCls = (position: Position): string => {
-  const defaultCls = `statusNotification`
+const getNotificationCls = (position: Position, darkMode: boolean): string => {
+  const defaultCls = `statusNotification ${
+    darkMode ? 'darkColor' : 'defaultColor'
+  }`
   switch (position) {
     case 'bottomLeft':
-      return `${defaultCls} AnchorOriginBottomLeft`
+      return `${defaultCls} anchorOriginBottomLeft`
     case 'bottomRight':
-      return `${defaultCls} AnchorOriginBottomRight`
+      return `${defaultCls} anchorOriginBottomRight`
     case 'centered':
       return `${defaultCls}`
     default:
-      return `${defaultCls} AnchorOriginBottomLeft`
+      return `${defaultCls} anchorOriginBottomLeft`
   }
 }

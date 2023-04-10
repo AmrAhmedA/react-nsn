@@ -1,14 +1,19 @@
 :root {
-  --darkmode-color: #171717;
-  --link-color: #216fdb;
-  --main-icon-color: #bcc0c4;
-  --green-color: #00a400;
-  --secondary-button-background: #e4e6eb;
-  --secondary-button-background-on-dark: rgba(0, 0, 0, 0.4);
-  --hover-overlay: rgba(0, 0, 0, 0.05);
-  --notifier-background-color: #ffffff;
+  --dark-background-color: #1c1e21;
+  --dark-close-icon-hover: #ffffff33;
+  --dark-close-icon: #ffffff1a;
+  --dark-close: #ffffff;
+  --dark-text: #1c1e21;
+  --default-background-color: #ffffff;
+  --default-close-icon-hover: #e4e6eb;
+  --default-close-icon: #e4e6eba5;
+  --default-close: rgb(28, 30, 33);
+  --default-text: #e4e6eb;
   --enter-animation: cubic-bezier(0.14, 1, 0.34, 1);
   --exit-animation: cubic-bezier(0.45, 0.1, 0.2, 1);
+  --green-color: #00a400;
+  --link-color: #4599ff;
+  --main-icon-color: #bcc0c4;
 }
 .App {
   text-align: center;
@@ -19,7 +24,6 @@
 
 .statusNotification {
   align-items: center;
-  background-color: var(--notifier-background-color);
   border-radius: 8px;
   bottom: 24px;
   direction: ltr;
@@ -37,16 +41,25 @@
   -webkit-box-pack: start;
   -webkit-font-smoothing: antialiased;
 }
-.AnchorOriginBottomLeft {
+
+.defaultColor {
+  background-color: var(--default-background-color);
+  color: var(--dark-text);
+}
+
+.darkColor {
+  background-color: var(--dark-background-color);
+  color: var(--default-text);
+}
+
+.anchorOriginBottomLeft {
   left: 24px;
 }
 
-.AnchorOriginBottomRight {
+.anchorOriginBottomRight {
   right: 24px;
 }
-.darkModeColor {
-  fill: var(--darkmode-color);
-}
+
 .onlineColor {
   fill: var(--green-color);
 }
@@ -58,7 +71,6 @@
 }
 .statusNotification > .statusNotificationIcon {
   box-sizing: border-box;
-  color: var(--darkmode-color);
   pointer-events: all;
   position: relative;
   -webkit-font-smoothing: antialiased;
@@ -67,6 +79,7 @@
 .statusNotification > .statusNotificationRefresh > span {
   cursor: pointer;
 }
+
 .statusNotification > .statusNotificationRefresh {
   color: var(--link-color);
   direction: ltr;
@@ -79,11 +92,14 @@
   overflow-wrap: break-word;
   pointer-events: all;
   text-align: left;
-  text-decoration: none solid var(--link-color) auto;
   touch-action: manipulation;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   -ms-touch-action: manipulation;
+}
+
+.statusNotification > .statusNotificationRefresh:hover {
+  text-decoration: underline solid var(--link-color) auto;
 }
 
 .statusNotification > .statusNotificationCloseIcon {
@@ -91,13 +107,25 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: var(--hover-overlay);
   cursor: pointer;
   border-radius: 50%;
 }
 
-.statusNotification > .statusNotificationCloseIcon:hover {
-  background-color: var(--secondary-button-background);
+.statusNotification > .statusNotificationCloseIcon.defaultColor {
+  background-color: var(--default-close-icon);
+  fill: var(--default-close);
+}
+.statusNotification > .statusNotificationCloseIcon.defaultColor:hover {
+  background-color: var(--default-close-icon-hover);
+}
+
+.statusNotification > .statusNotificationCloseIcon.darkColor {
+  background-color: var(--dark-close-icon);
+  fill: var(--dark-close);
+}
+
+.statusNotification > .statusNotificationCloseIcon.darkColor:hover {
+  background-color: var(--dark-close-icon-hover);
 }
 
 .fade-enter,
@@ -110,6 +138,9 @@
   opacity: 1;
   transform: translateY(0%);
   transition: opacity 260ms, transform 260ms var(--enter-animation);
+  -o-transition: opacity 260ms, transform 260ms var(--enter-animation);
+  -moz-transition: opacity 260ms, transform 260ms var(--enter-animation);
+  -webkit-transition: opacity 260ms, transform 260ms var(--enter-animation);
 }
 .fade-enter-done {
   opacity: 1;
@@ -122,6 +153,9 @@
   opacity: 0.3;
   transform: translateY(200%);
   transition: opacity 260ms, transform 260ms var(--exit-animation);
+  -o-transition: opacity 260ms, transform 260ms var(--exit-animation);
+  -moz-transition: opacity 260ms, transform 260ms var(--exit-animation);
+  -webkit-transition: opacity 260ms, transform 260ms var(--exit-animation);
 }
 
 .fade-exit-done {
