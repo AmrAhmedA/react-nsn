@@ -21,6 +21,7 @@
     "type": "git",
     "url": "https://github.com/AmrAhmedA/react-nsn"
   },
+  "source": "src/nsn.ts",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -32,13 +33,12 @@
     "@types/react-transition-group": "^4.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-transition-group": "^4.4.5",
-    "web-vitals": "^2.1.4"
+    "react-transition-group": "^4.4.5"
   },
   "scripts": {
-    "start": "parcel public/index.html -p 3000",
+    "start": "cd example && npm run start",
     "prebuild": "rm -rf dist/",
-    "build": "parcel build public/index.html",
+    "build": "parcel build",
     "type-check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "prepare": "husky install",

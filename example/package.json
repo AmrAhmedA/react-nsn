@@ -1,0 +1,38 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "alias": {
+    "react": "../node_modules/react",
+    "react-dom": "../node_modules/react-dom",
+    "react-nsn": "../src/nsn.ts"
+  },
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "scripts": {
+    "start": "parcel index.html -p 3000 --open",
+    "build": "parcel build index.html",
+    "clean": "rimraf dist && rimraf --glob node_modules"
+  },
+  "devDependencies": {
+    "@parcel/packager-raw-url": "^2.8.3",
+    "@parcel/config-default": "^2.4.0",
+    "@parcel/resolver-glob": "^2.8.3",
+    "@parcel/transformer-typescript-tsc": "^2.4.0",
+    "@parcel/transformer-webmanifest": "^2.8.3",
+    "@types/react": "^17.0.43",
+    "@types/react-dom": "^17.0.14",
+    "@types/styled-components": "^5.1.24",
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
+    "parcel": "^2.8.3",
+    "typescript": "^5.0.4"
+  }
+}

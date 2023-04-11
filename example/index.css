@@ -1,0 +1,173 @@
+:root {
+  --dark-background-color: #1c1e21;
+  --dark-close-icon-hover: #fff3;
+  --dark-close-icon: #ffffff1a;
+  --dark-close: #fff;
+  --dark-text: #1c1e21;
+  --default-background-color: #fff;
+  --default-close-icon-hover: #e4e6eb;
+  --default-close-icon: #e4e6eba5;
+  --default-close: #1c1e21;
+  --default-text: #e4e6eb;
+  --enter-animation: cubic-bezier(.14, 1, .34, 1);
+  --exit-animation: cubic-bezier(.45, .1, .2, 1);
+  --green-color: #00a400;
+  --link-color: #4599ff;
+  --main-icon-color: #bcc0c4;
+}
+
+.App {
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+.statusNotification {
+  direction: ltr;
+  height: 48px;
+  min-width: 288px;
+  text-align: left;
+  z-index: 10000;
+  -webkit-font-smoothing: antialiased;
+  border-radius: 8px;
+  -webkit-box-align: center;
+  -webkit-box-pack: start;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 10px;
+  line-height: 16px;
+  display: flex;
+  position: fixed;
+  bottom: 24px;
+  transform: scale(1);
+}
+
+.defaultColor {
+  background-color: var(--default-background-color);
+  color: var(--dark-text);
+}
+
+.darkColor {
+  background-color: var(--dark-background-color);
+  color: var(--default-text);
+}
+
+.anchorOriginBottomLeft {
+  left: 24px;
+}
+
+.anchorOriginBottomRight {
+  right: 24px;
+}
+
+.onlineColor {
+  fill: var(--green-color);
+}
+
+.mainColor {
+  fill: var(--main-icon-color);
+}
+
+.statusNotification div {
+  padding: 6px;
+}
+
+.statusNotification > .statusNotificationIcon {
+  box-sizing: border-box;
+  pointer-events: all;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+.statusNotification > .statusNotificationRefresh > span {
+  cursor: pointer;
+}
+
+.statusNotification > .statusNotificationRefresh {
+  color: var(--link-color);
+  direction: ltr;
+  max-width: 100%;
+  min-width: 0;
+  outline-color: var(--link-color);
+  overflow-wrap: break-word;
+  pointer-events: all;
+  text-align: left;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -ms-touch-action: manipulation;
+  font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 18px;
+  display: block;
+}
+
+.statusNotification > .statusNotificationRefresh:hover {
+  -webkit-text-decoration: underline solid var(--link-color) auto;
+  text-decoration: underline solid var(--link-color) auto;
+}
+
+.statusNotification > .statusNotificationCloseIcon {
+  cursor: pointer;
+  border-radius: 50%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.statusNotification > .statusNotificationCloseIcon.defaultColor {
+  background-color: var(--default-close-icon);
+  fill: var(--default-close);
+}
+
+.statusNotification > .statusNotificationCloseIcon.defaultColor:hover {
+  background-color: var(--default-close-icon-hover);
+}
+
+.statusNotification > .statusNotificationCloseIcon.darkColor {
+  background-color: var(--dark-close-icon);
+  fill: var(--dark-close);
+}
+
+.statusNotification > .statusNotificationCloseIcon.darkColor:hover {
+  background-color: var(--dark-close-icon-hover);
+}
+
+.fade-enter, .fade-appear {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.fade-enter-active, .fade-appear-active {
+  opacity: 1;
+  transition: opacity .26s, transform .26s var(--enter-animation);
+  -o-transition: opacity .26s, transform .26s var(--enter-animation);
+  -moz-transition: opacity .26s, transform .26s var(--enter-animation);
+  -webkit-transition: opacity .26s, transform .26s var(--enter-animation);
+  transform: translateY(0%);
+}
+
+.fade-enter-done {
+  opacity: 1;
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateY(0%);
+}
+
+.fade-exit-active {
+  opacity: .3;
+  transition: opacity .26s, transform .26s var(--exit-animation);
+  -o-transition: opacity .26s, transform .26s var(--exit-animation);
+  -moz-transition: opacity .26s, transform .26s var(--exit-animation);
+  -webkit-transition: opacity .26s, transform .26s var(--exit-animation);
+  transform: translateY(200%);
+}
+
+.fade-exit-done {
+  opacity: 0;
+}
+
+/*# sourceMappingURL=index.css.map */
