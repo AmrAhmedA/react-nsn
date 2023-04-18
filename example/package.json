@@ -1,9 +1,9 @@
 {
   "name": "example",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "alias": {
     "react": "../node_modules/react",
     "react-dom": "../node_modules/react-dom",
@@ -11,16 +11,12 @@
   },
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "start": "parcel index.html -p 3000 --open",
-    "build": "parcel build index.html",
-    "clean": "rimraf dist && rimraf --glob node_modules"
+    "build": "tsc && vite build",
+    "clean": "rimraf dist && rimraf --glob node_modules",
+    "dev": "vite",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "@parcel/packager-raw-url": "^2.8.3",
-    "@parcel/config-default": "^2.4.0",
-    "@parcel/resolver-glob": "^2.8.3",
-    "@parcel/transformer-typescript-tsc": "^2.4.0",
-    "@parcel/transformer-webmanifest": "^2.8.3",
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
     "@types/styled-components": "^5.1.24",
@@ -32,7 +28,8 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
-    "parcel": "^2.8.3",
+    "vite": "^4.2.0",
+    "@vitejs/plugin-react": "^3.1.0",
     "typescript": "^5.0.4"
   }
 }

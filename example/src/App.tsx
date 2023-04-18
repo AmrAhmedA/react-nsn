@@ -1,5 +1,4 @@
-// @ts-ignore
-import { OnlineStatusNotifier } from 'react-nsn'
+import { OnlineStatusNotifier } from '../../src/OnlineStatusNotifier'
 import './App.css'
 function App() {
   return (
