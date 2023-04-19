@@ -1,8 +1,9 @@
 {
   "name": "react-nsn",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "A very lightweight and customizable online network status notification built for react apps.",
+  "license": "MIT",
   "keywords": [
     "react",
     "notification",
@@ -25,18 +26,20 @@
   "dependencies": {
     "react-transition-group": "^4.4.5"
   },
+  "homepage": "https://github.com/AmrAhmedA/react-nsn",
   "type": "module",
   "scripts": {
-    "dev": "cd example && npm run dev",
-    "prebuild": "rm -rf dist/",
     "build": "tsc && vite build",
-    "type-check": "tsc --pretty --noEmit",
-    "preview": "vite preview",
-    "lint": "eslint . --ext ts --ext tsx --ext js",
-    "prepare": "husky install",
+    "clean": "rimraf dist && rimraf --glob node_modules",
+    "deploy:npm": "npm publish",
+    "dev": "cd example && npm run dev",
     "format": "prettier --write src",
+    "lint": "eslint . --ext ts --ext tsx --ext js",
     "pre-commit": "lint-staged",
-    "clean": "rimraf dist && rimraf --glob node_modules"
+    "prebuild": "rm -rf dist/",
+    "prepare": "husky install",
+    "preview": "vite preview",
+    "type-check": "tsc --pretty --noEmit"
   },
   "files": [
     "dist"
