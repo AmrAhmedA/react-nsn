@@ -10,7 +10,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/nsn.ts'),
       name: 'react-nsn',
       fileName: 'react-nsn',
-      formats: ['es', 'umd']
+      formats: ['es']
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react-transition-group'],

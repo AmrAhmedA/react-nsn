@@ -1,5 +1,4 @@
 # Ignore artifacts:
 build
 dist
-.parcel-cache
 .cache
