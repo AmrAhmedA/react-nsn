@@ -23,13 +23,10 @@
     "url": "https://github.com/AmrAhmedA/react-nsn"
   },
   "source": "src/nsn.ts",
-  "dependencies": {
-    "react-transition-group": "^4.4.5"
-  },
   "homepage": "https://github.com/AmrAhmedA/react-nsn",
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --force",
     "clean": "rimraf dist && rimraf --glob node_modules",
     "deploy:npm": "npm publish",
     "dev": "cd example && npm run dev",
@@ -40,6 +37,9 @@
     "prepare": "husky install",
     "preview": "vite preview",
     "type-check": "tsc --pretty --noEmit"
+  },
+  "dependencies": {
+    "react-transition-group": "^4.4.5"
   },
   "files": [
     "dist",
@@ -71,6 +71,8 @@
     ]
   },
   "devDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.14",
     "@types/react": "^18.0.28",
@@ -88,8 +90,6 @@
     "prettier": "^2.8.7",
     "prettier-plugin-organize-imports": "^3.2.2",
     "process": "^0.11.10",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.0",
