@@ -23,28 +23,31 @@
   },
   "source": "src/nsn.ts",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.14",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "@types/react-transition-group": "^4.4.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "react-transition-group": "^4.4.5"
   },
+  "type": "module",
   "scripts": {
     "dev": "cd example && npm run dev",
     "prebuild": "rm -rf dist/",
-    "build": "tsc && vite build src",
+    "build": "tsc && vite build",
     "type-check": "tsc --pretty --noEmit",
+    "preview": "vite preview",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "prepare": "husky install",
     "format": "prettier --write src",
     "pre-commit": "lint-staged",
     "clean": "rimraf dist && rimraf --glob node_modules"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/react-nsn.umd.cjs",
+  "module": "./dist/react-nsn.js",
+  "exports": {
+    ".": {
+      "import": "./dist/react-nsn.js",
+      "require": "./dist/react-nsn.umd.cjs"
+    }
   },
   "lint-staged": {
     "*.@(js|json|ts|tsx)": [
@@ -64,6 +67,13 @@
     ]
   },
   "devDependencies": {
+    "react-dom": "^18.2.0",
+    "react": "^18.2.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.14",
+    "@types/react-dom": "^18.0.11",
+    "@types/react-transition-group": "^4.4.5",
+    "@types/react": "^18.0.28",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
     "@vitejs/plugin-react": "^3.1.0",
@@ -79,5 +89,9 @@
     "rimraf": "^5.0.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.0"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
   }
 }

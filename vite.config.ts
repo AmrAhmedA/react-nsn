@@ -1,16 +1,23 @@
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 import { defineConfig } from 'vite'
-
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   build: {
-    assetsDir: '.',
+    lib: {
+      entry: resolve(__dirname, 'src/nsn.ts'),
+      name: 'react-nsn',
+      fileName: 'react-nsn',
+      formats: ['es', 'umd']
+    },
     rollupOptions: {
-      input: '/src',
+      external: ['react', 'react-dom', 'react-transition-group'],
       output: {
-        dir: 'dist',
-        entryFileNames: 'bundle.js'
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          'react-transition-group': 'ReactTransitionGroup'
+        }
       }
     }
   }
