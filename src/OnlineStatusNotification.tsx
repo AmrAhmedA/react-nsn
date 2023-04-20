@@ -16,7 +16,7 @@ type EventsCallback = {
   onCloseClick: () => void
 }
 
-interface OnlineStatusNotifierType {
+interface OnlineStatusNotificationType {
   darkMode?: boolean
   destoryOnClose?: boolean
   duration?: number
@@ -28,9 +28,9 @@ interface OnlineStatusNotifierType {
 const DefaultOnlineText = 'Your internet connection was restored.'
 const DefaultOfflineText = 'You are currently offline.'
 
-export const OnlineStatusNotifier = forwardRef<
+export const OnlineStatusNotification = forwardRef<
   HTMLDivElement,
-  OnlineStatusNotifierType
+  OnlineStatusNotificationType
 >((props, ref): JSX.Element => {
   const [isOpen, setIsOpen] = React.useState(false)
 

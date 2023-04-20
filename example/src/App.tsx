@@ -1,4 +1,4 @@
-import { OnlineStatusNotifier } from '../../src/OnlineStatusNotifier'
+import { OnlineStatusNotification } from '../../src/OnlineStatusNotification'
 import './App.css'
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
           className='App'
           style={{ height: '100vh', backgroundColor: 'white' }}
         >
-          <OnlineStatusNotifier darkMode={true} />
+          <OnlineStatusNotification darkMode={true} />
         </div>
       </header>
     </div>
