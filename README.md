@@ -2,11 +2,11 @@
 
 
 
-<div align="center">
-  <picture>
-    <img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-example.jpg" width="760" alt="Logo"/>
-  </picture>
-</div>
+
+Component             |  Example
+:-------------------------:|:-------------------------:
+<img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-example.jpg" alt="example"/>  |  <img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-animation.gif" alt="example-animation"/>
+
 
 <br>
 An important aspect of any modern web application is the ability to handle network connectivity issues. Whether it's a temporary loss of connection or the user being in an area with no network coverage, it's crucial for the app to be able to gracefully handle these scenarios and communicate the current network status to the user.
@@ -36,6 +36,7 @@ npm i react-nsn
 
 ### how to use
 
+add `<OnlineStatusNotifier/>` to your app, preferably at root level.
 ```jsx
 import { OnlineStatusNotifier, useOnlineStatus } from 'react-nsn'
 function App() {
