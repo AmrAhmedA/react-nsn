@@ -1,6 +1,14 @@
-## React Network Status Notification (React-nsn) 
-[![License](https://img.shields.io/npm/l/react-nsn)](https://github.com/AmrAhmedA/react-nsn/blob/main/LICENSE)
+## React Network Status Notification (React-nsn) [![License](https://img.shields.io/npm/l/react-nsn)](https://github.com/AmrAhmedA/react-nsn/blob/main/LICENSE)
 
+
+
+<div align="center">
+  <picture>
+    <img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-example.jpg" width="760" alt="Logo"/>
+  </picture>
+</div>
+
+<br>
 An important aspect of any modern web application is the ability to handle network connectivity issues. Whether it's a temporary loss of connection or the user being in an area with no network coverage, it's crucial for the app to be able to gracefully handle these scenarios and communicate the current network status to the user.
 
 Table of Contents
