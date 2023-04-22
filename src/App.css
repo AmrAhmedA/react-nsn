@@ -25,7 +25,6 @@
 .statusNotification {
   align-items: center;
   border-radius: 8px;
-  bottom: 24px;
   direction: ltr;
   display: flex;
   height: 48px;
@@ -52,12 +51,32 @@
   color: var(--default-text);
 }
 
-.anchorOriginBottomLeft {
+.topLeft {
+  top: 24px;
   left: 24px;
 }
 
-.anchorOriginBottomRight {
+.topRight {
+  top: 24px;
   right: 24px;
+}
+
+.topCenter {
+  top: 24px;
+}
+
+.bottomRight {
+  bottom: 24px;
+  right: 24px;
+}
+
+.bottomLeft {
+  bottom: 24px;
+  left: 24px;
+}
+
+.bottomCenter {
+  bottom: 24px;
 }
 
 .onlineColor {
