@@ -9,7 +9,7 @@ type StatusText = {
   offline?: string
 }
 
-type Position = 'bottomLeft' | 'bottomRight' | 'centered'
+type Position = 'topLeft' | 'topRight' | 'topCenter' | 'bottomLeft' | 'bottomRight' | 'bottomCenter'
 
 type EventsCallback = {
   onRefreshClick: () => void
@@ -119,7 +119,7 @@ export const OnlineStatusNotification = forwardRef<
             classNames='fade'
           >
             <div
-              className={getNotificationCls(position, darkMode)}
+              className={classNames('statusNotification', darkMode ? 'darkColor' : 'defaultColor', position)}
               ref={nodeRef}
               onMouseEnter={() => {
                 setHovering(true)
@@ -140,9 +140,7 @@ export const OnlineStatusNotification = forwardRef<
               )}
               {/* close icon */}
               <div
-                className={`statusNotificationCloseIcon ${
-                  darkMode ? 'darkColor' : 'defaultColor'
-                }`}
+                className={classNames('statusNotificationCloseIcon', darkMode ? 'darkColor' : 'defaultColor')}
                 onClick={handleCloseButtonClick}
               >
                 {closeIcon}
@@ -160,18 +158,4 @@ const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
     ? statusText?.online ?? DefaultOnlineText
     : statusText?.offline ?? DefaultOfflineText
 
-const getNotificationCls = (position: Position, darkMode: boolean): string => {
-  const defaultCls = `statusNotification ${
-    darkMode ? 'darkColor' : 'defaultColor'
-  }`
-  switch (position) {
-    case 'bottomLeft':
-      return `${defaultCls} anchorOriginBottomLeft`
-    case 'bottomRight':
-      return `${defaultCls} anchorOriginBottomRight`
-    case 'centered':
-      return `${defaultCls}`
-    default:
-      return `${defaultCls} anchorOriginBottomLeft`
-  }
-}
+const classNames = (...classes) => classes.filter(Boolean).join(" ");
