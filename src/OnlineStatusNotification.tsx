@@ -9,7 +9,13 @@ type StatusText = {
   offline?: string
 }
 
-type Position = 'topLeft' | 'topRight' | 'topCenter' | 'bottomLeft' | 'bottomRight' | 'bottomCenter'
+type Position =
+  | 'topLeft'
+  | 'topRight'
+  | 'topCenter'
+  | 'bottomLeft'
+  | 'bottomRight'
+  | 'bottomCenter'
 
 type EventsCallback = {
   onRefreshClick: () => void
@@ -119,7 +125,11 @@ export const OnlineStatusNotification = forwardRef<
             classNames='fade'
           >
             <div
-              className={classNames('statusNotification', darkMode ? 'darkColor' : 'defaultColor', position)}
+              className={classNames(
+                'statusNotification',
+                darkMode ? 'darkColor' : 'defaultColor',
+                position
+              )}
               ref={nodeRef}
               onMouseEnter={() => {
                 setHovering(true)
@@ -140,7 +150,10 @@ export const OnlineStatusNotification = forwardRef<
               )}
               {/* close icon */}
               <div
-                className={classNames('statusNotificationCloseIcon', darkMode ? 'darkColor' : 'defaultColor')}
+                className={classNames(
+                  'statusNotificationCloseIcon',
+                  darkMode ? 'darkColor' : 'defaultColor'
+                )}
                 onClick={handleCloseButtonClick}
               >
                 {closeIcon}
@@ -158,4 +171,4 @@ const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
     ? statusText?.online ?? DefaultOnlineText
     : statusText?.offline ?? DefaultOfflineText
 
-const classNames = (...classes) => classes.filter(Boolean).join(" ");
+const classNames = (...classes: unknown[]) => classes.filter(Boolean).join(' ')
