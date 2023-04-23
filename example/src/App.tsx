@@ -1,8 +1,10 @@
 import {
   OnlineStatusNotification,
-  Position
-} from '../../src/OnlineStatusNotification'
+  Position,
+  useOnlineStatus
+} from '../../src/nsn'
 import './App.css'
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
@@ -118,12 +120,23 @@ function App() {
     darkMode: true
   })
 
+  const { isOnline } = useOnlineStatus()
+
   return (
     <div className='App'>
       <Container maxWidth="md">
         <Typography variant="h6" gutterBottom>
           React Network status notification - React-nsn
         </Typography>
+
+        <Grid container alignItems={'center'} justifyContent={'center'}>
+          <Alert
+            severity={isOnline ? 'success' : 'error'}
+          >{`Your current app status is ${
+            isOnline ? `online` : 'offline'
+          }`}</Alert>
+        </Grid>
+
         <div
           className='App'
           style={{ height: '100vh', backgroundColor: 'white' }}
