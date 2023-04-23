@@ -30,5 +30,10 @@
     "lint-staged": "^13.2.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/material": "^5.12.1"
   }
 }

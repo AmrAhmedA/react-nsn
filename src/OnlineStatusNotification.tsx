@@ -9,7 +9,7 @@ type StatusText = {
   offline?: string
 }
 
-type Position =
+export type Position =
   | 'topLeft'
   | 'topRight'
   | 'topCenter'
