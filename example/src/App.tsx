@@ -6,8 +6,6 @@ import './App.css'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import FormGroup from '@mui/material/FormGroup'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
@@ -17,13 +15,13 @@ import { styled } from '@mui/material/styles'
 import { useReducer } from 'react'
 
 type ReducerActions = {
-  type: 'position' | 'duration'
-  payload: { position: Position }
+  type: 'position' | 'darkMode'
+  payload: { position?: Position; darkMode?: boolean }
 }
 
 type State = {
   position: Position
-  duration: number
+  darkMode: boolean
 }
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
@@ -79,11 +77,11 @@ function reducer(state: State, action: ReducerActions) {
     case 'position':
       newState = { ...state, position: action.payload.position }
       break
-    case 'duration':
-      newState = { ...state }
+    case 'darkMode':
+      newState = { ...state, darkMode: action.payload.darkMode }
       break
     default:
-      newState = { position: 'bottomLeft', duration: 2000 }
+      newState = { position: 'bottomLeft', darkMode: true }
   }
   return newState
 }
@@ -117,7 +115,7 @@ const POSITIONS_ARR: { label: string; position: Position }[] = [
 function App() {
   const [state, dispatch] = useReducer(reducer, {
     position: 'bottomLeft',
-    duration: 2000
+    darkMode: true
   })
 
   return (
@@ -176,16 +174,26 @@ function App() {
             <Typography variant="h5" gutterBottom>
               Dark mode
             </Typography>
-            <FormGroup>
-              <Grid justifyContent={'center'}>
-                <FormControlLabel
-                  control={<MaterialUISwitch sx={{ m: 1 }} defaultChecked />}
-                  label="Toggle notification component dark mode"
-                />
-              </Grid>
-            </FormGroup>
+            <Grid
+              container
+              justifyContent={'center'}
+              direction={'row'}
+              alignItems={'center'}
+            >
+              <MaterialUISwitch
+                sx={{ m: 1 }}
+                checked={state.darkMode}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'darkMode',
+                    payload: { darkMode: e.target.checked }
+                  })
+                }
+              />
+              <Typography>Component</Typography>
+            </Grid>
           </Stack>
-          <OnlineStatusNotification darkMode={true} position={state.position} />
+          <OnlineStatusNotification {...state} />
         </div>
       </Container>
     </div>
