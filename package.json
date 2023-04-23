@@ -1,6 +1,6 @@
 {
   "name": "react-nsn",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": false,
   "description": "A very lightweight and customizable online network status notification built for react apps.",
   "license": "MIT",
@@ -30,7 +30,7 @@
     "clean": "rimraf dist && rimraf --glob node_modules",
     "deploy:npm": "npm publish",
     "dev": "cd example && npm run dev",
-    "format": "prettier --write src",
+    "format": "rome format src --write",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "pre-commit": "lint-staged",
     "prebuild": "rm -rf dist/",
@@ -71,8 +71,6 @@
     ]
   },
   "devDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.14",
     "@types/react": "^18.0.28",
@@ -87,10 +85,11 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
-    "prettier": "^2.8.7",
-    "prettier-plugin-organize-imports": "^3.2.2",
     "process": "^0.11.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "rimraf": "^5.0.0",
+    "rome": "^12.0.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.0",
     "vite-plugin-css-injected-by-js": "^3.1.0"

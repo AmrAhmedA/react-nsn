@@ -1,8 +1,8 @@
-import React, { forwardRef, useEffect } from 'react'
-import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import './App.css'
 import { useFirstRender, useOnlineStatus } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
+import React, { forwardRef, useEffect } from 'react'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
 
 type StatusText = {
   online?: string
