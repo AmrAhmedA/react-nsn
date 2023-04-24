@@ -1,5 +1,5 @@
 import { State } from '../App'
-import { Grid, Typography } from '@mui/material'
+import { Grid, Slider, Typography } from '@mui/material'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
@@ -57,17 +57,19 @@ type DarkModeContainerProps = {
   state: State
   dispatch: any
   onStatusInputChange: (e: React.ChangeEvent) => void
+  onDurationChange: (e: any) => void
 }
 
 export function DarkModeContainer({
   state,
   dispatch,
-  onStatusInputChange
+  onStatusInputChange,
+  onDurationChange
 }: DarkModeContainerProps) {
   return (
     <>
       <Typography variant="h6" gutterBottom>
-        Toggle darkmode & Custom status text
+        Toggle darkmode, Custom status text, duration
       </Typography>
       <Stack
         direction="row"
@@ -77,22 +79,39 @@ export function DarkModeContainer({
         <Grid
           container
           justifyContent={'center'}
-          direction={'row'}
           alignItems={'center'}
           item
           xs={6}
         >
-          <MaterialUISwitch
-            sx={{ m: 1 }}
-            checked={state.darkMode}
-            onChange={(e) =>
-              dispatch({
-                type: 'darkMode',
-                payload: { darkMode: e.target.checked }
-              })
-            }
-          />
-          <Typography>Component</Typography>
+          <Stack direction="column" spacing={2}>
+            <div>
+              <Typography>darkmode: {state.darkMode ? 'On' : 'Off'}</Typography>
+
+              <MaterialUISwitch
+                sx={{ m: 1 }}
+                checked={state.darkMode}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'darkMode',
+                    payload: { darkMode: e.target.checked }
+                  })
+                }
+              />
+            </div>
+            <Divider />
+            <div>
+              <Typography>
+                Notification duration: {state.duration * 1000} ms
+              </Typography>
+              <Slider
+                value={state.duration}
+                min={1}
+                max={10}
+                aria-label="Disabled slider"
+                onChange={onDurationChange}
+              />
+            </div>
+          </Stack>
         </Grid>
 
         <Grid container item xs={6} justifyContent={'center'}>

@@ -15,17 +15,24 @@ import Stack from '@mui/material/Stack'
 import { useReducer } from 'react'
 
 type ReducerActions = {
-  type: 'position' | 'darkMode' | 'onlineStatusText' | 'offlineStatusText'
+  type:
+    | 'position'
+    | 'darkMode'
+    | 'onlineStatusText'
+    | 'offlineStatusText'
+    | 'duration'
   payload: {
     position?: Position
     darkMode?: boolean
     statusText?: { online?: string; offline?: string }
+    duration?: number
   }
 }
 
 export type State = {
-  position: Position
   darkMode: boolean
+  duration: number
+  position: Position
   statusText: {
     online?: string
     offline?: string
@@ -40,6 +47,9 @@ function reducer(state: State, action: ReducerActions) {
       break
     case 'darkMode':
       newState = { ...state, darkMode: action.payload.darkMode }
+      break
+    case 'duration':
+      newState = { ...state, duration: action.payload.duration }
       break
     case 'onlineStatusText':
       newState = {
@@ -63,6 +73,7 @@ function reducer(state: State, action: ReducerActions) {
       newState = {
         position: 'bottomLeft',
         darkMode: true,
+        duration: 4.5,
         statusText: {
           online: `Your internet connection was restored.`,
           offline: `You are currently offline.`
@@ -75,6 +86,7 @@ function reducer(state: State, action: ReducerActions) {
 function App() {
   const [state, dispatch] = useReducer(reducer, {
     position: 'bottomLeft',
+    duration: 4.5,
     darkMode: true,
     statusText: {
       online: `Your internet connection was restored.`,
@@ -85,17 +97,25 @@ function App() {
   const { isOnline } = useOnlineStatus()
 
   const handleStatusInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.id === 'online-controlled') {
+    const { id, value } = e.target
+    if (id === 'online-controlled') {
       dispatch({
         type: 'onlineStatusText',
-        payload: { statusText: { online: e.target.value } }
+        payload: { statusText: { online: value } }
       })
-    } else if (e.target.id === 'offline-controlled') {
+    } else if (id === 'offline-controlled') {
       dispatch({
         type: 'offlineStatusText',
-        payload: { statusText: { offline: e.target.value } }
+        payload: { statusText: { offline: value } }
       })
     }
+  }
+
+  const handleDurationChange = (e: any) => {
+    dispatch({
+      type: 'duration',
+      payload: { duration: e.target.value }
+    })
   }
 
   return (
@@ -124,6 +144,7 @@ function App() {
               state={state}
               dispatch={dispatch}
               onStatusInputChange={handleStatusInputChange}
+              onDurationChange={handleDurationChange}
             />
             <Divider />
           </Stack>
