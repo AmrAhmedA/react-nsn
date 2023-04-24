@@ -16,14 +16,17 @@ jobs:
         with:
           persist-credentials: false
           submodules: true 
-
       - name: Install 
-        run: npm install
-
+        run: | 
+          npm install
+          cd example 
+          npm install
       - name: Build 
-        run: npm run build
+        run:  |
+          cd example
+          npm run build
       - name: Deploy to GH Pages 
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build
+          publish_dir: example/dist
