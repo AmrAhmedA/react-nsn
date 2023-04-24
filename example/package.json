@@ -11,7 +11,8 @@
   },
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "build": "tsc && vite build ",
+    "build:prod": "tsc && vite build --base=https://amrahmeda.github.io/react-nsn/",
+    "build": "tsc && vite build",
     "clean": "rimraf dist && rimraf --glob node_modules",
     "dev": "vite",
     "preview": "vite preview"

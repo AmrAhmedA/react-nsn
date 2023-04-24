@@ -31,13 +31,13 @@
     "deploy:npm": "npm publish",
     "dev": "cd example && npm run dev",
     "format": "rome format src --write",
+    "git-is-clean": "git status && git diff-index HEAD",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "pre-commit": "lint-staged",
     "prebuild": "rm -rf dist/",
     "prepare": "husky install",
     "preview": "vite preview",
-    "type-check": "tsc --pretty --noEmit",
-    "git-is-clean": "git status && git diff-index HEAD"
+    "type-check": "tsc --pretty --noEmit"
   },
   "dependencies": {
     "react-transition-group": "^4.4.5"
