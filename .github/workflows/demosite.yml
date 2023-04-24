@@ -4,7 +4,7 @@ name: Build and deploy
 on:
   push:
     branches:
-      - feature/example
+      - main
 
 jobs:
   build-deploy-gh-pages:
