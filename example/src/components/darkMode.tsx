@@ -1,5 +1,9 @@
+import { State } from '../App'
 import { Grid, Typography } from '@mui/material'
+import Divider from '@mui/material/Divider'
+import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
+import TextField from '@mui/material/TextField'
 import { styled } from '@mui/material/styles'
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
@@ -48,30 +52,76 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     borderRadius: 20 / 2
   }
 }))
-export function DarkModeContainer({ state, dispatch }) {
+
+type DarkModeContainerProps = {
+  state: State
+  dispatch: any
+  onStatusInputChange: (e: React.ChangeEvent) => void
+}
+
+export function DarkModeContainer({
+  state,
+  dispatch,
+  onStatusInputChange
+}: DarkModeContainerProps) {
   return (
     <>
       <Typography variant="h6" gutterBottom>
-        Dark mode
+        Toggle darkmode & Custom status text
       </Typography>
-      <Grid
-        container
-        justifyContent={'center'}
-        direction={'row'}
-        alignItems={'center'}
+      <Stack
+        direction="row"
+        divider={<Divider orientation="vertical" flexItem />}
+        spacing={2}
       >
-        <MaterialUISwitch
-          sx={{ m: 1 }}
-          checked={state.darkMode}
-          onChange={(e) =>
-            dispatch({
-              type: 'darkMode',
-              payload: { darkMode: e.target.checked }
-            })
-          }
-        />
-        <Typography>Component</Typography>
-      </Grid>
+        <Grid
+          container
+          justifyContent={'center'}
+          direction={'row'}
+          alignItems={'center'}
+          item
+          xs={6}
+        >
+          <MaterialUISwitch
+            sx={{ m: 1 }}
+            checked={state.darkMode}
+            onChange={(e) =>
+              dispatch({
+                type: 'darkMode',
+                payload: { darkMode: e.target.checked }
+              })
+            }
+          />
+          <Typography>Component</Typography>
+        </Grid>
+
+        <Grid container item xs={6} justifyContent={'center'}>
+          <TextField
+            fullWidth
+            id="online-controlled"
+            label="Online status text"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onStatusInputChange(event)
+            }
+            size='small'
+            style={{ margin: '16px' }}
+            value={state['statusText']['online']}
+            variant="standard"
+          />
+          <TextField
+            fullWidth
+            id="offline-controlled"
+            label="Offline status text"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              onStatusInputChange(event)
+            }}
+            size='small'
+            style={{ margin: '16px' }}
+            value={state['statusText']['offline']}
+            variant="standard"
+          />
+        </Grid>
+      </Stack>
     </>
   )
 }

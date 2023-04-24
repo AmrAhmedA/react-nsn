@@ -6,28 +6,28 @@ import Typography from '@mui/material/Typography'
 
 const POSITIONS_ARR: { label: string; position: Position }[] = [
   {
-    label: 'bottom-left',
-    position: 'bottomLeft'
-  },
-  {
-    label: 'bottom-right',
-    position: 'bottomRight'
-  },
-  {
-    label: 'bottom-center',
-    position: 'bottomCenter'
-  },
-  {
     label: 'top-left',
     position: 'topLeft'
+  },
+  {
+    label: 'top-center',
+    position: 'topCenter'
   },
   {
     label: 'top-right',
     position: 'topRight'
   },
   {
-    label: 'top-center',
-    position: 'topCenter'
+    label: 'bottom-left',
+    position: 'bottomLeft'
+  },
+  {
+    label: 'bottom-center',
+    position: 'bottomCenter'
+  },
+  {
+    label: 'bottom-right',
+    position: 'bottomRight'
   }
 ]
 export function PositionContainer({ state, dispatch }) {
