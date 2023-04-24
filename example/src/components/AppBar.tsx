@@ -20,6 +20,9 @@ export function AppBarContainer() {
               edge="end"
               color="inherit"
               aria-label="menu"
+              onClick={() =>
+                window.open('https://github.com/AmrAhmedA/react-nsn', '_blank')
+              }
             >
               <GitHubIcon />
             </IconButton>

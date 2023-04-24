@@ -56,8 +56,13 @@ function App() {
           className='App'
           style={{ height: '100vh', backgroundColor: 'white' }}
         >
-          <Stack direction="column" spacing={2}>
-            <Grid container alignItems={'center'} justifyContent={'center'}>
+          <Stack direction="column" spacing={3}>
+            <Grid
+              container
+              alignItems={'center'}
+              justifyContent={'center'}
+              style={{ marginTop: '24px' }}
+            >
               <Alert
                 severity={isOnline ? 'success' : 'error'}
               >{`Your current app status is ${
