@@ -11,7 +11,7 @@
   },
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc && vite build ",
     "clean": "rimraf dist && rimraf --glob node_modules",
     "dev": "vite",
     "preview": "vite preview"
