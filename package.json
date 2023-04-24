@@ -36,7 +36,8 @@
     "prebuild": "rm -rf dist/",
     "prepare": "husky install",
     "preview": "vite preview",
-    "type-check": "tsc --pretty --noEmit"
+    "type-check": "tsc --pretty --noEmit",
+    "git-is-clean": "git status && git diff-index HEAD"
   },
   "dependencies": {
     "react-transition-group": "^4.4.5"

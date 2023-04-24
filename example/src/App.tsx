@@ -122,7 +122,6 @@ function App() {
     <div className='App'>
       <Container maxWidth="md">
         <AppBarContainer />
-
         <div className='App' style={{ backgroundColor: 'white' }}>
           <Stack direction="column" spacing={3}>
             <Grid
