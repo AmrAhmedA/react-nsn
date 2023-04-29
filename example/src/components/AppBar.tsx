@@ -7,7 +7,10 @@ import IconButton from '@mui/material/IconButton'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 
-export function AppBarContainer() {
+type AppBarContainerProps = {
+  onInfoButtonClick: () => void
+}
+export function AppBarContainer({ onInfoButtonClick }: AppBarContainerProps) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -21,6 +24,7 @@ export function AppBarContainer() {
               edge="end"
               color="inherit"
               aria-label="menu"
+              onClick={onInfoButtonClick}
             >
               <InfoIcon />
             </IconButton>

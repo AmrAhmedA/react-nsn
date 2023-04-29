@@ -5,7 +5,7 @@
 
 Component             |  Example
 :-------------------------:|:-------------------------:
-<img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-example.jpg" alt="example"/>  |  <img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-animation.gif" alt="example-animation"/>
+<img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/src/assets/notification-example.jpg" alt="example"/>  |  <img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/src/assets/notification-animation.gif" alt="example-animation"/>
 
 
 <br>

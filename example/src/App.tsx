@@ -5,6 +5,7 @@ import {
 } from '../../src/nsn'
 import './App.css'
 import { AppBarContainer } from './components/AppBar'
+import { InfoModal } from './components/InfoModal'
 import { DarkModeContainer } from './components/darkMode'
 import { PositionContainer } from './components/position'
 import Alert from '@mui/material/Alert'
@@ -12,7 +13,7 @@ import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
-import { useReducer } from 'react'
+import { useReducer, useState } from 'react'
 
 type ReducerActions = {
   type:
@@ -94,6 +95,11 @@ function App() {
     }
   })
 
+  const [openInfoModal, setOpenInfoModal] = useState(false)
+
+  const handleCloseInfoModal = () => setOpenInfoModal(false)
+  const handleOpenInfoModal = () => setOpenInfoModal(true)
+
   const { isOnline } = useOnlineStatus()
 
   const handleStatusInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,7 +127,7 @@ function App() {
   return (
     <div className='App'>
       <Container maxWidth="md">
-        <AppBarContainer />
+        <AppBarContainer onInfoButtonClick={handleOpenInfoModal} />
         <div className='App' style={{ backgroundColor: 'white' }}>
           <Stack direction="column" spacing={3}>
             <Grid
@@ -147,7 +153,10 @@ function App() {
             />
             <Divider />
           </Stack>
-
+          <InfoModal
+            onCloseInfoModal={handleCloseInfoModal}
+            open={openInfoModal}
+          />
           <OnlineStatusNotification {...state} />
         </div>
       </Container>

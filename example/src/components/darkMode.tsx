@@ -69,7 +69,7 @@ export function DarkModeContainer({
   return (
     <>
       <Typography variant="h6" gutterBottom>
-        Toggle darkmode, Custom status text, duration
+        Toggle darkmode, custom status text, duration
       </Typography>
       <Stack
         direction="row"
