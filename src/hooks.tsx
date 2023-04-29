@@ -22,24 +22,35 @@ function getConnectionInfo() {
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-function useOnlineStatus(
+type UseOnlineStatusProps = {
+  pollingUrl?: string
+  pollingDuration?: number
+}
+
+function useOnlineStatus({
   pollingUrl = 'https://www.gstatic.com/generate_204',
-  pollingDuration = 20000
-): {
+  pollingDuration = 12000
+}: UseOnlineStatusProps = {}): {
   error: unknown
   isOffline: boolean
   isOnline: boolean
-  since: { time: Date; difference: string }
+  time: { since: Date; difference: string }
   connectionInfo: NetworkInformation
 } {
-  const [isOnline, setIsOnline] = useState<{ online: boolean; since: Date }>({
+  const [isOnline, setIsOnline] = useState<{
+    online: boolean
+    time: { since: Date; diff: string }
+  }>({
     online:
       isNavigatorObjectAvailable &&
       isWindowDocumentAvailable &&
       typeof navigator.onLine === 'boolean'
         ? navigator.onLine
         : true,
-    since: new Date()
+    time: {
+      since: new Date(),
+      diff: timeSince(new Date())
+    }
   })
 
   const connectionInfo = getConnectionInfo()
@@ -50,18 +61,40 @@ function useOnlineStatus(
     prevOnlineState.current = isOnline.online
   }, [isOnline])
 
-  const _onlineStatusFn = useCallback(
-    async () =>
-      await fetch(pollingUrl, { mode: 'no-cors' })
-        .then(
-          (response) =>
-            response &&
-            !prevOnlineState.current &&
-            setIsOnline({ online: true, since: new Date() })
-        )
-        .catch(() => setIsOnline({ online: false, since: new Date() })),
-    [pollingUrl]
-  )
+  const _onlineStatusFn = useCallback(async () => {
+    await fetch(pollingUrl, { mode: 'no-cors' })
+      .then(
+        (response) =>
+          response &&
+          !prevOnlineState.current &&
+          setIsOnline((prevState) => {
+            return {
+              online: true,
+              time: {
+                since: prevState.time.since,
+                diff: timeSince(prevState.time.since)
+              }
+            }
+          })
+      )
+      .catch(() =>
+        setIsOnline((prevState) => {
+          return { online: false, time: prevState.time }
+        })
+      )
+      .finally(() => {
+        // updating time diff
+        setIsOnline((prevState) => {
+          return {
+            online: prevState.online,
+            time: {
+              since: prevState.time.since,
+              diff: timeSince(prevState.time.since)
+            }
+          }
+        })
+      })
+  }, [pollingUrl])
 
   useInterval(_onlineStatusFn, pollingDuration)
 
@@ -69,7 +102,9 @@ function useOnlineStatus(
     async ({ type }: Event) => {
       type === 'online'
         ? _onlineStatusFn()
-        : setIsOnline({ online: false, since: new Date() })
+        : setIsOnline((prevState) => {
+            return { online: false, time: prevState.time }
+          })
     },
     [_onlineStatusFn]
   )
@@ -89,7 +124,7 @@ function useOnlineStatus(
     error: null,
     isOffline: !isOnline.online,
     isOnline: isOnline.online,
-    since: { time: isOnline.since, difference: timeSince(isOnline.since) },
+    time: { since: isOnline.time.since, difference: isOnline.time.diff },
     connectionInfo
   }
 }
@@ -149,9 +184,16 @@ function timeSince(date: any) {
   if (interval > 1) {
     return Math.floor(interval) + ' hours'
   }
+
   interval = seconds / 60
-  if (interval > 1) {
+
+  if (interval > 2) {
     return Math.floor(interval) + ' minutes'
   }
+
+  if (interval > 1) {
+    return Math.floor(interval) + ' minute'
+  }
+
   return Math.floor(seconds) + ' seconds'
 }
