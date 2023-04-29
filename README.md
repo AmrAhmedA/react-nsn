@@ -92,6 +92,16 @@ function App() {
 | pollingUrl        | `string`          | `https://www.gstatic.com/generate_204`   | the url used to perform [polling](https://en.wikipedia.org/wiki/Polling_(computer_science)) | 
 | pollingDuration   | `number`          | 12000ms    | fixed delays time between requests |
 
+```useOnlineStatus``` hook offers the following:
+
+| Name         | Type            | Default   | Description                                                                                                                                                               |
+|------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
+| isOnline        | `boolean`          |    | app online status | 
+| isOffline   | `boolean`          |     | app offline status |
+| time.since    | `Date`          |     | specifies the date of the last status |
+| time.difference    | `string`          |     | the difference in time between latest network status and the current time |
+| connectionInfo    |           |     | The [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API) provides information about the system's connection in terms of general connection type (e.g., 'wifi, 'cellular', etc.). |
+
 
 ### Compatibility
 
