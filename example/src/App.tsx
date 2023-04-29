@@ -98,9 +98,10 @@ function App() {
   const [openInfoModal, setOpenInfoModal] = useState(false)
 
   const handleCloseInfoModal = () => setOpenInfoModal(false)
+
   const handleOpenInfoModal = () => setOpenInfoModal(true)
 
-  const { isOnline } = useOnlineStatus()
+  const { isOnline, since } = useOnlineStatus()
 
   const handleStatusInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
@@ -140,7 +141,7 @@ function App() {
                 severity={isOnline ? 'success' : 'error'}
               >{`Your current app status is ${
                 isOnline ? `online` : 'offline'
-              }`}</Alert>
+              } since ${since.difference}`}</Alert>
             </Grid>
             <Divider />
             <PositionContainer state={state} dispatch={dispatch} />

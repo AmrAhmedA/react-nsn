@@ -10,6 +10,15 @@ const isWindowDocumentAvailable = typeof window !== 'undefined'
 
 const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
 
+function getConnectionInfo() {
+  return (
+    navigator['connection'] ||
+    navigator['mozConnection'] ||
+    navigator['webkitConnection'] ||
+    null
+  )
+}
+
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
@@ -20,18 +29,21 @@ function useOnlineStatus(
   error: unknown
   isOffline: boolean
   isOnline: boolean
+  since: { time: Date; difference: string }
 } {
-  const [isOnline, setIsOnline] = useState<boolean>(() =>
-    isNavigatorObjectAvailable &&
-    isWindowDocumentAvailable &&
-    typeof navigator.onLine === 'boolean'
-      ? navigator.onLine
-      : true
-  )
+  const [isOnline, setIsOnline] = useState<{ online: boolean; since: Date }>({
+    online:
+      isNavigatorObjectAvailable &&
+      isWindowDocumentAvailable &&
+      typeof navigator.onLine === 'boolean'
+        ? navigator.onLine
+        : true,
+    since: new Date()
+  })
   const prevOnlineState = useRef<boolean>()
 
   useEffect(() => {
-    prevOnlineState.current = isOnline
+    prevOnlineState.current = isOnline.online
   }, [isOnline])
 
   const _onlineStatusFn = useCallback(
@@ -39,9 +51,11 @@ function useOnlineStatus(
       await fetch(pollingUrl, { mode: 'no-cors' })
         .then(
           (response) =>
-            response && !prevOnlineState.current && setIsOnline(true)
+            response &&
+            !prevOnlineState.current &&
+            setIsOnline({ online: true, since: new Date() })
         )
-        .catch(() => setIsOnline(false)),
+        .catch(() => setIsOnline({ online: false, since: new Date() })),
     [pollingUrl]
   )
 
@@ -49,7 +63,9 @@ function useOnlineStatus(
 
   const handleOnlineStatus = useCallback(
     async ({ type }: Event) => {
-      type === 'online' ? _onlineStatusFn() : setIsOnline(false)
+      type === 'online'
+        ? _onlineStatusFn()
+        : setIsOnline({ online: false, since: new Date() })
     },
     [_onlineStatusFn]
   )
@@ -67,8 +83,9 @@ function useOnlineStatus(
 
   return {
     error: null,
-    isOffline: !isOnline,
-    isOnline
+    isOffline: !isOnline.online,
+    isOnline: isOnline.online,
+    since: { time: isOnline.since, difference: timeSince(isOnline.since) }
   }
 }
 
@@ -106,3 +123,30 @@ function useFirstRender(): { isFirstRender: boolean } {
 }
 
 export { useFirstRender, useOnlineStatus }
+
+function timeSince(date: any) {
+  var seconds = Math.floor(((new Date() as any) - date) / 1000)
+
+  var interval = seconds / 31536000
+
+  if (interval > 1) {
+    return Math.floor(interval) + ' years'
+  }
+  interval = seconds / 2592000
+  if (interval > 1) {
+    return Math.floor(interval) + ' months'
+  }
+  interval = seconds / 86400
+  if (interval > 1) {
+    return Math.floor(interval) + ' days'
+  }
+  interval = seconds / 3600
+  if (interval > 1) {
+    return Math.floor(interval) + ' hours'
+  }
+  interval = seconds / 60
+  if (interval > 1) {
+    return Math.floor(interval) + ' minutes'
+  }
+  return Math.floor(seconds) + ' seconds'
+}
