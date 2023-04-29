@@ -26,8 +26,8 @@ export function InfoModal({ onCloseInfoModal, open }: InfoModalProps) {
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <Typography variant="h6" component="h2">
-          How to change the online network status of your app?
+        <Typography variant="h6" component="h6" style={{ textAlign: 'center' }}>
+          How to change the online network status of this app?
         </Typography>
         <Typography sx={{ mt: 2 }}>
           Activate network developer tools on <strong>Google Chrome</strong>, by
@@ -42,8 +42,9 @@ export function InfoModal({ onCloseInfoModal, open }: InfoModalProps) {
           </ul>
         </Typography>
         <Typography>
-          from the developer tools Network tab Choose <code>offline</code> from
-          selectbox to disable your app online status.
+          from the developer tools network tab choose <code>Offline</code> from
+          selectbox to disable your app online status. you will see the online
+          network notification pops up.
         </Typography>
         <div style={{ justifyContent: 'center', display: 'flex' }}>
           <img src={animation2} />
