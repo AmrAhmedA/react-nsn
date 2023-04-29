@@ -30,6 +30,7 @@ function useOnlineStatus(
   isOffline: boolean
   isOnline: boolean
   since: { time: Date; difference: string }
+  connectionInfo: NetworkInformation
 } {
   const [isOnline, setIsOnline] = useState<{ online: boolean; since: Date }>({
     online:
@@ -40,6 +41,9 @@ function useOnlineStatus(
         : true,
     since: new Date()
   })
+
+  const connectionInfo = getConnectionInfo()
+
   const prevOnlineState = useRef<boolean>()
 
   useEffect(() => {
@@ -85,7 +89,8 @@ function useOnlineStatus(
     error: null,
     isOffline: !isOnline.online,
     isOnline: isOnline.online,
-    since: { time: isOnline.since, difference: timeSince(isOnline.since) }
+    since: { time: isOnline.since, difference: timeSince(isOnline.since) },
+    connectionInfo
   }
 }
 
@@ -125,9 +130,9 @@ function useFirstRender(): { isFirstRender: boolean } {
 export { useFirstRender, useOnlineStatus }
 
 function timeSince(date: any) {
-  var seconds = Math.floor(((new Date() as any) - date) / 1000)
+  const seconds = Math.floor(((new Date() as any) - date) / 1000)
 
-  var interval = seconds / 31536000
+  let interval = seconds / 31536000
 
   if (interval > 1) {
     return Math.floor(interval) + ' years'

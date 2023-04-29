@@ -37,6 +37,7 @@
     "prebuild": "rm -rf dist/",
     "prepare": "husky install",
     "preview": "vite preview",
+    "reinstall": "npm run clean && npm install", 
     "type-check": "tsc --pretty --noEmit"
   },
   "dependencies": {
