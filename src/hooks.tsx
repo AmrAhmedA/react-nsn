@@ -1,3 +1,4 @@
+import { NetworkInformation } from './network-information-api'
 import {
   useCallback,
   useEffect,

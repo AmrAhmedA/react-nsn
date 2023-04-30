@@ -14,7 +14,7 @@ type ConnectionType =
   | 'unknown'
   | 'wifi'
   | 'wimax'
-interface NetworkInformation extends EventTarget {
+export interface NetworkInformation extends EventTarget {
   readonly type?: ConnectionType
   readonly effectiveType?: EffectiveConnectionType
   readonly downlinkMax?: Megabit
