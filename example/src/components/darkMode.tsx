@@ -101,12 +101,12 @@ export function DarkModeContainer({
             <Divider />
             <div>
               <Typography>
-                Notification duration: {state.duration * 1000} ms
+                Notification duration: {state.duration} ms
               </Typography>
               <Slider
                 value={state.duration}
-                min={1}
-                max={10}
+                min={1000}
+                max={10000}
                 aria-label="Disabled slider"
                 onChange={onDurationChange}
               />
