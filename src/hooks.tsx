@@ -55,41 +55,45 @@ function useOnlineStatus({
 
   const connectionInfo = getConnectionInfo()
 
-  const prevOnlineState = useRef<boolean>()
-
-  useEffect(() => {
-    prevOnlineState.current = isOnline.online
-  }, [isOnline])
-
   const _onlineStatusFn = useCallback(async () => {
     await fetch(pollingUrl, { mode: 'no-cors' })
       .then(
         (response) =>
           response &&
-          !prevOnlineState.current &&
           setIsOnline((prevState) => {
+            if (prevState.online) {
+              return {
+                online: true,
+                time: {
+                  since: prevState.time.since,
+                  diff: timeSince(prevState.time.since)
+                }
+              }
+            }
             return {
               online: true,
+              time: {
+                since: new Date(),
+                diff: timeSince(new Date())
+              }
+            }
+          })
+      )
+      .catch(() => {
+        return setIsOnline((prevState) => {
+          if (!prevState.online)
+            return {
+              online: false,
               time: {
                 since: prevState.time.since,
                 diff: timeSince(prevState.time.since)
               }
             }
-          })
-      )
-      .catch(() =>
-        setIsOnline((prevState) => {
-          return { online: false, time: prevState.time }
-        })
-      )
-      .finally(() => {
-        // updating time diff
-        setIsOnline((prevState) => {
           return {
-            online: prevState.online,
+            online: false,
             time: {
-              since: prevState.time.since,
-              diff: timeSince(prevState.time.since)
+              since: new Date(),
+              diff: timeSince(new Date())
             }
           }
         })
@@ -102,8 +106,12 @@ function useOnlineStatus({
     async ({ type }: Event) => {
       type === 'online'
         ? _onlineStatusFn()
-        : setIsOnline((prevState) => {
-            return { online: false, time: prevState.time }
+        : setIsOnline({
+            online: false,
+            time: {
+              since: new Date(),
+              diff: timeSince(new Date())
+            }
           })
     },
     [_onlineStatusFn]
