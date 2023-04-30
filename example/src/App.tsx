@@ -87,7 +87,7 @@ function reducer(state: State, action: ReducerActions) {
 function App() {
   const [state, dispatch] = useReducer(reducer, {
     position: 'bottomLeft',
-    duration: 4.5,
+    duration: 4500,
     darkMode: true,
     statusText: {
       online: `Your internet connection was restored.`,
