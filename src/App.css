@@ -39,6 +39,7 @@
   -webkit-box-align: center;
   -webkit-box-pack: start;
   -webkit-font-smoothing: antialiased;
+  box-shadow: 0 0px 10px 0px rgba(30, 41, 60, 0.2)
 }
 
 .defaultColor {

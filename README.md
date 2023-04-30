@@ -5,11 +5,19 @@
 
 Component             |  Example
 :-------------------------:|:-------------------------:
-<img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-example.jpg" alt="example"/>  |  <img src="https://github.com/AmrAhmedA/react-nsn/blob/main/example/assets/notification-animation.gif" alt="example-animation"/>
+<img src="https://github.com/AmrAhmedA/react-nsn/blob/dev/example/src/assets/notification-example.jpg" alt="example"/>  |  <img src="https://github.com/AmrAhmedA/react-nsn/blob/dev/example/src/assets/notification-animation.gif" alt="example-animation"/>
 
 
 <br>
-An important aspect of any modern web application is the ability to handle network connectivity issues. Whether it's a temporary loss of connection or the user being in an area with no network coverage, it's crucial for the app to be able to gracefully handle these scenarios and communicate the current network status to the user.
+<p><strong>React-nsn</strong> offers convenient and customizable </p>
+
+1. Network status hook `useOnlineStatus()`
+   - app online network status
+   - status time info
+   - network information
+   - custom polling
+2. Notification component `<OnlineStatusNotification/>`
+
 
 Table of Contents
 --
@@ -23,7 +31,7 @@ Table of Contents
 
 
 ### Online demo
-Soon 
+https://amrahmeda.github.io/react-nsn
 
 
 # Getting Started
@@ -34,18 +42,29 @@ npm i react-nsn
 ```
 
 
-### how to use
+### How to use
 
-add `<OnlineStatusNotifier/>` to your app, preferably at root level.
+add `<OnlineStatusNotifier/>` to your app, preferably at root level. 
 ```jsx
 import { OnlineStatusNotifier, useOnlineStatus } from 'react-nsn'
-function App() {
 
-  const { isOnline } = useOnlineStatus()
+function App() {
+  const {
+    isOnline,
+    time: { difference, since },
+    connectionInfo
+  } = useOnlineStatus()
+
+  // logs current connection info
+  console.log(connectionInfo)
+
+  const statusText = isOnline ? `online` : `offline`
 
   return (
     <div>
-      <h1>{`online status: ${isOnline}`}</h1>
+      <h1>{`App is ${statusText}`}</h1>
+      <h1>{`the app is ${statusText} since: ${since}`}</h1>
+      <h1>{`difference in time since the component was ${statusText}: ${difference}`}</h1>
       <OnlineStatusNotifier darkMode={true} />
     </div>
   )
@@ -59,7 +78,7 @@ function App() {
 |------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
 | darkMode        | `boolean`          | `false`   | toggle dark mode |
 | destroyOnClose  | `boolean`          | `true`    | destroy when notification component unmount |
-| duration        | `number`           | 4500ms    | duration of the notification when it appear on screen before hiding back |
+| duration        | `number`           | 4500ms    | duration of the notification when it pops up on screen before hiding back |
 | onRefreshClick  | `function`         |           | derived from <code>eventsCallback</code>, callback function triggered when refresh is clicked during offline status  |
 | onCloseClick    | `function`         |           | derived from <code>eventsCallback</code>, callback function triggered when close button is clicked |
 | position        | `string`           | `bottomLeft` | `bottomLeft`  `bottomRight`  `centered`  |
@@ -71,7 +90,17 @@ function App() {
 | Name         | Type            | Default   | Description                                                                                                                                                               |
 |------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
 | pollingUrl        | `string`          | `https://www.gstatic.com/generate_204`   | the url used to perform [polling](https://en.wikipedia.org/wiki/Polling_(computer_science)) | 
-| pollingDuration   | `number`          | `20000ms`    | fixed delays time between requests |
+| pollingDuration   | `number`          | 12000ms    | fixed delays time between requests |
+
+```useOnlineStatus``` hook offers the following:
+
+| Name         | Type            | Default   | Description                                                                                                                                                               |
+|------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
+| isOnline        | `boolean`          |    | app online status | 
+| isOffline   | `boolean`          |     | app offline status |
+| time.since    | `Date`          |     | specifies the date of the last status |
+| time.difference    | `string`          |     | the difference in time between latest network status and the current time |
+| connectionInfo    |           |     | The [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API) provides information about the system's connection in terms of general connection type (e.g., 'wifi, 'cellular', etc.). |
 
 
 ### Compatibility

@@ -1,15 +1,15 @@
-import React, { forwardRef, useEffect } from 'react'
-import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import './App.css'
 import { useFirstRender, useOnlineStatus } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
+import React, { forwardRef, useEffect } from 'react'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
 
 type StatusText = {
   online?: string
   offline?: string
 }
 
-type Position =
+export type Position =
   | 'topLeft'
   | 'topRight'
   | 'topCenter'
@@ -43,7 +43,7 @@ export const OnlineStatusNotification = forwardRef<
   const {
     darkMode = false,
     destoryOnClose = true,
-    duration = 4.5,
+    duration = 4500,
     eventsCallback,
     position = 'bottomLeft',
     statusText
@@ -80,7 +80,7 @@ export const OnlineStatusNotification = forwardRef<
     if (!hovering && duration > 0 && isOpen) {
       timeoutRef.current = setTimeout(() => {
         toggleVisibility(false)
-      }, duration * 1000)
+      }, duration)
 
       return cleanupFn
     }

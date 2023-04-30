@@ -2,11 +2,9 @@
 
 # dependencies
 /node_modules
-/.pnp
-.pnp.js
 /dist 
 /.cache
-/.parcel-cache
+/.vscode
 
 # testing
 /coverage
