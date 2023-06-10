@@ -34,7 +34,7 @@ interface OnlineStatusNotificationType {
 const DefaultOnlineText = 'Your internet connection was restored.'
 const DefaultOfflineText = 'You are currently offline.'
 
-export const OnlineStatusNotification = forwardRef<
+const OnlineStatusNotificationComponent = forwardRef<
   HTMLDivElement,
   OnlineStatusNotificationType
 >((props, ref): JSX.Element => {
@@ -165,6 +165,10 @@ export const OnlineStatusNotification = forwardRef<
     </>
   )
 })
+
+export const OnlineStatusNotification = React.memo(
+  OnlineStatusNotificationComponent
+)
 
 const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
   isOnline

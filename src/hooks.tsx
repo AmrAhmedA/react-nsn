@@ -160,15 +160,14 @@ export function useInterval(
 }
 
 function useFirstRender(): { isFirstRender: boolean } {
-  const firstUpdate = useRef(true)
+  const [firstRender, setFirstRender] = useState(true)
 
+  const { isOffline } = useOnlineStatus()
   useIsomorphicLayoutEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false
-    }
-  }, [])
+    if (firstRender && isOffline) setFirstRender(false)
+  }, [isOffline])
 
-  return { isFirstRender: firstUpdate.current }
+  return { isFirstRender: firstRender }
 }
 
 export { useFirstRender, useOnlineStatus }
