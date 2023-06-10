@@ -127,10 +127,10 @@ function App() {
 
   return (
     <div className='App'>
-      <Container maxWidth="md">
+      <Container maxWidth='md'>
         <AppBarContainer onInfoButtonClick={handleOpenInfoModal} />
         <div className='App' style={{ backgroundColor: 'white' }}>
-          <Stack direction="column" spacing={3}>
+          <Stack direction='column' spacing={3}>
             <Grid
               container
               alignItems={'center'}
