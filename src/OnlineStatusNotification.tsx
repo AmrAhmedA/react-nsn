@@ -1,5 +1,5 @@
 import './App.css'
-import { useFirstRender, useOnlineStatus } from './hooks'
+import { useFirstRender } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
 import React, { forwardRef, useEffect } from 'react'
 import { CSSTransition, SwitchTransition } from 'react-transition-group'
@@ -27,6 +27,7 @@ interface OnlineStatusNotificationType {
   destoryOnClose?: boolean
   duration?: number
   eventsCallback?: EventsCallback
+  isOnline: boolean
   position?: Position
   statusText?: StatusText
 }
@@ -45,6 +46,7 @@ const OnlineStatusNotificationComponent = forwardRef<
     destoryOnClose = true,
     duration = 4500,
     eventsCallback,
+    isOnline,
     position = 'bottomLeft',
     statusText
   } = props
@@ -56,8 +58,6 @@ const OnlineStatusNotificationComponent = forwardRef<
   const offlineRef = React.useRef<HTMLDivElement>(null)
 
   const timeoutRef = React.useRef(null)
-
-  const { isOnline } = useOnlineStatus()
 
   const { isFirstRender } = useFirstRender()
 

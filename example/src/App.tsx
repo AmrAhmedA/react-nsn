@@ -101,7 +101,7 @@ function App() {
 
   const handleOpenInfoModal = () => setOpenInfoModal(true)
 
-  const { isOnline, time } = useOnlineStatus()
+  const { isOnline, time, attributes } = useOnlineStatus()
 
   const handleStatusInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
@@ -158,7 +158,7 @@ function App() {
             onCloseInfoModal={handleCloseInfoModal}
             open={openInfoModal}
           />
-          <OnlineStatusNotification {...state} />
+          <OnlineStatusNotification {...state} {...attributes} />
         </div>
       </Container>
     </div>

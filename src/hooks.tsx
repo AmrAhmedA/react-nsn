@@ -32,11 +32,12 @@ function useOnlineStatus({
   pollingUrl = 'https://www.gstatic.com/generate_204',
   pollingDuration = 12000
 }: UseOnlineStatusProps = {}): {
+  attributes: { isOnline: boolean }
+  connectionInfo: NetworkInformation
   error: unknown
   isOffline: boolean
   isOnline: boolean
   time: { since: Date; difference: string }
-  connectionInfo: NetworkInformation
 } {
   const [isOnline, setIsOnline] = useState<{
     online: boolean
@@ -130,11 +131,12 @@ function useOnlineStatus({
   }, [handleOnlineStatus])
 
   return {
+    attributes: { isOnline: isOnline.online },
+    connectionInfo,
     error: null,
     isOffline: !isOnline.online,
     isOnline: isOnline.online,
-    time: { since: isOnline.time.since, difference: isOnline.time.diff },
-    connectionInfo
+    time: { since: isOnline.time.since, difference: isOnline.time.diff }
   }
 }
 

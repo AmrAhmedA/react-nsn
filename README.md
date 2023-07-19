@@ -50,9 +50,10 @@ import { OnlineStatusNotifier, useOnlineStatus } from 'react-nsn'
 
 function App() {
   const {
+    attributes,
     isOnline,
     time: { difference, since },
-    connectionInfo
+    connectionInfo,
   } = useOnlineStatus()
 
   // logs current connection info
@@ -65,7 +66,7 @@ function App() {
       <h1>{`App is ${statusText}`}</h1>
       <h1>{`the app is ${statusText} since: ${since}`}</h1>
       <h1>{`difference in time since the component was ${statusText}: ${difference}`}</h1>
-      <OnlineStatusNotifier darkMode={true} />
+      <OnlineStatusNotifier darkMode={true} {...attributes} />
     </div>
   )
 }
@@ -101,6 +102,7 @@ function App() {
 | time.since    | `Date`          |     | specifies the date of the last status |
 | time.difference    | `string`          |     | the difference in time between latest network status and the current time |
 | connectionInfo    |           |     | The [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API) provides information about the system's connection in terms of general connection type (e.g., 'wifi, 'cellular', etc.). |
+| attributes    | `object`          |     | passed to `<OnlineStatusNotification/>` as prop |
 
 
 ### Compatibility
