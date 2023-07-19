@@ -1,6 +1,6 @@
 {
   "name": "react-nsn",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "private": false,
   "description": "A very lightweight and customizable online network status notification built for react apps.",
   "license": "MIT",
