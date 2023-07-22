@@ -47,12 +47,12 @@
     "dist",
     "dist/*.css"
   ],
-  "main": "./dist/react-nsn.umd.cjs",
+  "main": "./dist/react-nsn.cjs",
   "module": "./dist/react-nsn.js",
   "exports": {
     ".": {
       "import": "./dist/react-nsn.js",
-      "require": "./dist/react-nsn.umd.cjs"
+      "require": "./dist/react-nsn.cjs"
     }
   },
   "lint-staged": {
