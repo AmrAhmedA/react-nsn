@@ -35,6 +35,28 @@ interface OnlineStatusNotificationType {
 const DefaultOnlineText = 'Your internet connection was restored.'
 const DefaultOfflineText = 'You are currently offline.'
 
+/**
+ * The notification component will pop up when the network status becomes offline and will popup once again when it goes back online
+ * @example
+ * Simple example to use the notification component
+ * ```
+ * function App() {
+ *   const { attributes } = useOnlineStatus()
+ *
+ *   return <OnlineStatusNotifier {...attributes} />
+ * }
+ *
+ * ```
+ * @param darkMode toggle dark mode on
+ * @param destoryOnClose remove notification from dom when it hides
+ * @param duration duration of the notification in ms
+ * @param eventsCallback object that contains 2 callbacks that are called when refresh button is clicked or close button clicked
+ * @param isOnline status of the app when online
+ * @param position customize notification component position
+ * @param statusText customize online/offline status objects.
+ * @returns JSX Element
+ *
+ */
 const OnlineStatusNotificationComponent = forwardRef<
   HTMLDivElement,
   OnlineStatusNotificationType
