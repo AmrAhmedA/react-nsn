@@ -1,19 +1,27 @@
+import * as packageJson from './package.json'
 import react from '@vitejs/plugin-react'
-import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
-
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import dts from 'vite-plugin-dts'
+
 export default defineConfig({
-  plugins: [react(), cssInjectedByJsPlugin()],
+  plugins: [
+    react(),
+    cssInjectedByJsPlugin(),
+    dts({
+      insertTypesEntry: true
+    })
+  ],
   build: {
     lib: {
       entry: resolve(__dirname, 'src/nsn.ts'),
       name: 'react-nsn',
       fileName: 'react-nsn',
-      formats: ['cjs']
+      formats: ['cjs', 'es']
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react-transition-group'],
+      external: [...Object.keys(packageJson.peerDependencies)],
       output: {
         globals: {
           react: 'React',
