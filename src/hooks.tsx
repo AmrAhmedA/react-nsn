@@ -1,4 +1,5 @@
 import { NetworkInformation } from './network-information-api'
+import { timeSince } from './utils'
 import {
   useCallback,
   useEffect,
@@ -27,6 +28,22 @@ type UseOnlineStatusProps = {
   pollingUrl?: string
   pollingDuration?: number
 }
+
+/**
+ * Return current network status, status time info, network information
+ * @example
+ * Here's simple example:
+ * ```
+ * // Prints "true":
+ * const { isOnline } = useOnlineStatus()
+ * console.log(isOnline) // Prints true in your app if network is online
+ * ```
+ * @param pollingUrl your custom polling url
+ * @param pollingDuration your custom polling duration in ms
+ * @returns Current network status, connection info,
+ * and time since online/offline,
+ * attributes to be passed to notification component if used
+ */
 
 function useOnlineStatus({
   pollingUrl = 'https://www.gstatic.com/generate_204',
@@ -140,6 +157,14 @@ function useOnlineStatus({
   }
 }
 
+/**
+ *
+ * @param callback function that is called in an interval of time
+ * @param delay delay between intervals, specified in ms
+ *
+ * @internal
+ *
+ */
 export function useInterval(
   callback: () => Promise<void>,
   delay: number | null
@@ -161,6 +186,13 @@ export function useInterval(
   }, [delay])
 }
 
+/**
+ *
+ * @returns flag that indicates if its the first render for the component
+ *
+ * @internal
+ *
+ */
 function useFirstRender(): { isFirstRender: boolean } {
   const [firstRender, setFirstRender] = useState(true)
 
@@ -173,37 +205,3 @@ function useFirstRender(): { isFirstRender: boolean } {
 }
 
 export { useFirstRender, useOnlineStatus }
-
-function timeSince(date: any) {
-  const seconds = Math.floor(((new Date() as any) - date) / 1000)
-
-  let interval = seconds / 31536000
-
-  if (interval > 1) {
-    return Math.floor(interval) + ' years'
-  }
-  interval = seconds / 2592000
-  if (interval > 1) {
-    return Math.floor(interval) + ' months'
-  }
-  interval = seconds / 86400
-  if (interval > 1) {
-    return Math.floor(interval) + ' days'
-  }
-  interval = seconds / 3600
-  if (interval > 1) {
-    return Math.floor(interval) + ' hours'
-  }
-
-  interval = seconds / 60
-
-  if (interval > 2) {
-    return Math.floor(interval) + ' minutes'
-  }
-
-  if (interval > 1) {
-    return Math.floor(interval) + ' minute'
-  }
-
-  return Math.floor(seconds) + ' seconds'
-}

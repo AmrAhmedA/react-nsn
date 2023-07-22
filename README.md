@@ -44,9 +44,9 @@ npm i react-nsn
 
 ### How to use
 
-add `<OnlineStatusNotifier/>` to your app, preferably at root level. 
+add `<OnlineStatusNotification/>` to your app, preferably at root level. 
 ```jsx
-import { OnlineStatusNotifier, useOnlineStatus } from 'react-nsn'
+import { OnlineStatusNotification, useOnlineStatus } from 'react-nsn'
 
 function App() {
   const {
@@ -66,7 +66,7 @@ function App() {
       <h1>{`App is ${statusText}`}</h1>
       <h1>{`the app is ${statusText} since: ${since}`}</h1>
       <h1>{`difference in time since the component was ${statusText}: ${difference}`}</h1>
-      <OnlineStatusNotifier darkMode={true} {...attributes} />
+      <OnlineStatusNotification darkMode={true} {...attributes} />
     </div>
   )
 }
