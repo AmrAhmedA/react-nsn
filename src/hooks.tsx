@@ -1,5 +1,5 @@
 import { NetworkInformation } from './network-information-api'
-import { timeSince } from './utils'
+import { DEFAULT_POLLING_URL, timeSince } from './utils'
 import {
   useCallback,
   useEffect,
@@ -29,6 +29,13 @@ type UseOnlineStatusProps = {
   pollingDuration?: number
 }
 
+const initialOnlineStatus =
+  isNavigatorObjectAvailable &&
+  isWindowDocumentAvailable &&
+  typeof navigator.onLine === 'boolean'
+    ? navigator.onLine
+    : true
+
 /**
  * Return current network status, status time info, network information
  * @example
@@ -46,12 +53,12 @@ type UseOnlineStatusProps = {
  */
 
 function useOnlineStatus({
-  pollingUrl = 'https://www.gstatic.com/generate_204',
+  pollingUrl = DEFAULT_POLLING_URL,
   pollingDuration = 12000
 }: UseOnlineStatusProps = {}): {
   attributes: { isOnline: boolean }
   connectionInfo: NetworkInformation
-  error: unknown
+  error: Error
   isOffline: boolean
   isOnline: boolean
   time: { since: Date; difference: string }
@@ -60,12 +67,7 @@ function useOnlineStatus({
     online: boolean
     time: { since: Date; diff: string }
   }>({
-    online:
-      isNavigatorObjectAvailable &&
-      isWindowDocumentAvailable &&
-      typeof navigator.onLine === 'boolean'
-        ? navigator.onLine
-        : true,
+    online: initialOnlineStatus,
     time: {
       since: new Date(),
       diff: timeSince(new Date())
