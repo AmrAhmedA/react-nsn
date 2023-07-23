@@ -128,63 +128,61 @@ const OnlineStatusNotificationComponent = forwardRef<
   if (isFirstRender && isOnline) return null
 
   return (
-    <>
-      <CSSTransition
-        in={isOpen}
-        timeout={260}
-        nodeRef={nodeRef}
-        appear={true}
-        classNames={'fade'}
-        unmountOnExit={destoryOnClose}
-      >
-        <SwitchTransition mode={'out-in'}>
-          <CSSTransition
-            key={isOnline ? 'Online' : 'Offline'}
-            nodeRef={nodeRef}
-            addEndListener={(done: () => void) => {
-              nodeRef.current?.addEventListener('transitionend', done, false)
+    <CSSTransition
+      in={isOpen}
+      timeout={260}
+      nodeRef={nodeRef}
+      appear={true}
+      classNames={'fade'}
+      unmountOnExit={destoryOnClose}
+    >
+      <SwitchTransition mode={'out-in'}>
+        <CSSTransition
+          key={isOnline ? 'Online' : 'Offline'}
+          nodeRef={nodeRef}
+          addEndListener={(done: () => void) => {
+            nodeRef.current?.addEventListener('transitionend', done, false)
+          }}
+          classNames='fade'
+        >
+          <div
+            className={classNames(
+              'statusNotification',
+              darkMode ? 'darkColor' : 'defaultColor',
+              position
+            )}
+            ref={nodeRef}
+            onMouseEnter={() => {
+              setHovering(true)
             }}
-            classNames='fade'
+            onMouseLeave={() => {
+              setHovering(false)
+            }}
           >
+            <div className='statusNotificationIcon'>
+              {isOnline ? onlineIcon : offlineIcon}
+            </div>
+            <div>{getStatusText(isOnline, statusText)}</div>
+            {/* refresh link */}
+            {!isOnline && (
+              <div className='statusNotificationRefresh'>
+                <span onClick={handleRefreshButtonClick}>Refresh</span>
+              </div>
+            )}
+            {/* close icon */}
             <div
               className={classNames(
-                'statusNotification',
-                darkMode ? 'darkColor' : 'defaultColor',
-                position
+                'statusNotificationCloseIcon',
+                darkMode ? 'darkColor' : 'defaultColor'
               )}
-              ref={nodeRef}
-              onMouseEnter={() => {
-                setHovering(true)
-              }}
-              onMouseLeave={() => {
-                setHovering(false)
-              }}
+              onClick={handleCloseButtonClick}
             >
-              <div className='statusNotificationIcon'>
-                {isOnline ? onlineIcon : offlineIcon}
-              </div>
-              <div>{getStatusText(isOnline, statusText)}</div>
-              {/* refresh link */}
-              {!isOnline && (
-                <div className='statusNotificationRefresh'>
-                  <span onClick={handleRefreshButtonClick}>Refresh</span>
-                </div>
-              )}
-              {/* close icon */}
-              <div
-                className={classNames(
-                  'statusNotificationCloseIcon',
-                  darkMode ? 'darkColor' : 'defaultColor'
-                )}
-                onClick={handleCloseButtonClick}
-              >
-                {closeIcon}
-              </div>
+              {closeIcon}
             </div>
-          </CSSTransition>
-        </SwitchTransition>
-      </CSSTransition>
-    </>
+          </div>
+        </CSSTransition>
+      </SwitchTransition>
+    </CSSTransition>
   )
 })
 
@@ -197,4 +195,4 @@ const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
     ? statusText?.online ?? DefaultOnlineText
     : statusText?.offline ?? DefaultOfflineText
 
-const classNames = (...classes: unknown[]) => classes.filter(Boolean).join(' ')
+const classNames = (...classes: string[]) => classes.filter(Boolean).join(' ')
