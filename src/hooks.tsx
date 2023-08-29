@@ -1,40 +1,110 @@
-import { NetworkInformation } from './network-information-api'
-import { DEFAULT_POLLING_URL, timeSince } from './utils'
 import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useReducer,
   useRef,
-  useState
-} from 'react'
+  useState,
+} from "react";
+import { NetworkInformation } from "./network-information-api";
+import { DEFAULT_POLLING_URL, timeSince } from "./utils";
 
-const isWindowDocumentAvailable = typeof window !== 'undefined'
+const isWindowDocumentAvailable = typeof window !== "undefined";
 
-const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
+const isNavigatorObjectAvailable = typeof navigator !== "undefined";
 
 function getConnectionInfo() {
   return (
-    navigator['connection'] ||
-    navigator['mozConnection'] ||
-    navigator['webkitConnection'] ||
+    navigator["connection"] ||
+    navigator["mozConnection"] ||
+    navigator["webkitConnection"] ||
     null
-  )
+  );
 }
 
 const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 type UseOnlineStatusProps = {
-  pollingUrl?: string
-  pollingDuration?: number
-}
+  pollingUrl?: string;
+  pollingDuration?: number;
+};
 
 const initialOnlineStatus =
   isNavigatorObjectAvailable &&
   isWindowDocumentAvailable &&
-  typeof navigator.onLine === 'boolean'
+  typeof navigator.onLine === "boolean"
     ? navigator.onLine
-    : true
+    : true;
+
+type ReducerActionTypes = "offline" | "online";
+type ReducerActions = {
+  type: ReducerActionTypes;
+};
+
+type State = {
+  online: boolean;
+  time: {
+    since: Date;
+    diff: string;
+  };
+};
+
+function statusReducer(prevState: State, action: ReducerActions) {
+  let newState: State;
+  switch (action.type) {
+    case "offline":
+      {
+        if (!prevState.online)
+          newState = {
+            ...prevState,
+            online: false,
+            time: {
+              since: prevState.time.since,
+              diff: timeSince(prevState.time.since),
+            },
+          };
+        // previous state is online, recalculate time
+        else if (prevState.online)
+          newState = {
+            ...prevState,
+            online: false,
+            time: {
+              since: new Date(),
+              diff: timeSince(new Date()),
+            },
+          };
+      }
+      break;
+    case "online":
+      {
+        if (prevState.online)
+          newState = {
+            ...prevState,
+            online: true,
+            time: {
+              since: prevState.time.since,
+              diff: timeSince(prevState.time.since),
+            },
+          };
+        // previous state is offline, recalculate time
+        else if (!prevState.online) {
+          newState = {
+            ...prevState,
+            online: true,
+            time: {
+              since: new Date(),
+              diff: timeSince(new Date()),
+            },
+          };
+        }
+      }
+      break;
+    default:
+      newState = { ...prevState };
+  }
+  return newState;
+}
 
 /**
  * Return current network status, status time info, network information
@@ -54,109 +124,73 @@ const initialOnlineStatus =
 
 function useOnlineStatus({
   pollingUrl = DEFAULT_POLLING_URL,
-  pollingDuration = 12000
+  pollingDuration = 12000,
 }: UseOnlineStatusProps = {}): {
-  attributes: { isOnline: boolean }
-  connectionInfo: NetworkInformation
-  error: Error
-  isOffline: boolean
-  isOnline: boolean
-  time: { since: Date; difference: string }
+  attributes: { isOnline: boolean };
+  connectionInfo: NetworkInformation;
+  error: Error;
+  isOffline: boolean;
+  isOnline: boolean;
+  time: { since: Date; difference: string };
 } {
-  const [isOnline, setIsOnline] = useState<{
-    online: boolean
-    time: { since: Date; diff: string }
-  }>({
+  const [statusState, dispatch] = useReducer(statusReducer, {
     online: initialOnlineStatus,
     time: {
       since: new Date(),
-      diff: timeSince(new Date())
-    }
-  })
+      diff: timeSince(new Date()),
+    },
+  });
 
-  const connectionInfo = getConnectionInfo()
+  const connectionInfo = getConnectionInfo();
 
   const _onlineStatusFn = useCallback(async () => {
-    await fetch(pollingUrl, { mode: 'no-cors' })
+    await fetch(pollingUrl, { mode: "no-cors" })
       .then(
         (response) =>
           response &&
-          setIsOnline((prevState) => {
-            if (prevState.online) {
-              return {
-                online: true,
-                time: {
-                  since: prevState.time.since,
-                  diff: timeSince(prevState.time.since)
-                }
-              }
-            }
-            return {
-              online: true,
-              time: {
-                since: new Date(),
-                diff: timeSince(new Date())
-              }
-            }
+          dispatch({
+            type: "online",
           })
       )
       .catch(() => {
-        return setIsOnline((prevState) => {
-          if (!prevState.online)
-            return {
-              online: false,
-              time: {
-                since: prevState.time.since,
-                diff: timeSince(prevState.time.since)
-              }
-            }
-          return {
-            online: false,
-            time: {
-              since: new Date(),
-              diff: timeSince(new Date())
-            }
-          }
-        })
-      })
-  }, [pollingUrl])
+        return dispatch({
+          type: "offline",
+        });
+      });
+  }, [pollingUrl]);
 
-  useInterval(_onlineStatusFn, pollingDuration)
+  useInterval(_onlineStatusFn, pollingDuration);
 
   const handleOnlineStatus = useCallback(
     async ({ type }: Event) => {
-      type === 'online'
+      type === "online"
         ? _onlineStatusFn()
-        : setIsOnline({
-            online: false,
-            time: {
-              since: new Date(),
-              diff: timeSince(new Date())
-            }
-          })
+        : dispatch({
+            type: "offline",
+          });
     },
     [_onlineStatusFn]
-  )
+  );
 
   // Reactive logic for detecting browser side online/offline
   useEffect(() => {
-    window.addEventListener('online', handleOnlineStatus)
-    window.addEventListener('offline', handleOnlineStatus)
+    window.addEventListener("online", handleOnlineStatus);
+    window.addEventListener("offline", handleOnlineStatus);
 
     return () => {
-      window.removeEventListener('online', handleOnlineStatus)
-      window.removeEventListener('offline', handleOnlineStatus)
-    }
-  }, [handleOnlineStatus])
+      window.removeEventListener("online", handleOnlineStatus);
+      window.removeEventListener("offline", handleOnlineStatus);
+    };
+  }, [handleOnlineStatus]);
 
   return {
-    attributes: { isOnline: isOnline.online },
+    attributes: { isOnline: statusState.online },
     connectionInfo,
     error: null,
-    isOffline: !isOnline.online,
-    isOnline: isOnline.online,
-    time: { since: isOnline.time.since, difference: isOnline.time.diff }
-  }
+    isOffline: !statusState.online,
+    isOnline: statusState.online,
+    time: { since: statusState.time.since, difference: statusState.time.diff },
+  };
 }
 
 /**
@@ -171,21 +205,21 @@ export function useInterval(
   callback: () => Promise<void>,
   delay: number | null
 ) {
-  const savedCallback = useRef<() => void | null>()
+  const savedCallback = useRef<() => void | null>();
 
   useEffect(() => {
-    savedCallback.current = callback
-  }, [callback])
+    savedCallback.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     function tick() {
-      savedCallback.current()
+      savedCallback.current();
     }
     if (delay !== null) {
-      const id = setInterval(tick, delay)
-      return () => clearInterval(id)
+      const id = setInterval(tick, delay);
+      return () => clearInterval(id);
     }
-  }, [delay])
+  }, [delay]);
 }
 
 /**
@@ -196,14 +230,14 @@ export function useInterval(
  *
  */
 function useFirstRender(): { isFirstRender: boolean } {
-  const [firstRender, setFirstRender] = useState(true)
+  const [firstRender, setFirstRender] = useState(true);
 
-  const { isOffline } = useOnlineStatus()
+  const { isOffline } = useOnlineStatus();
   useIsomorphicLayoutEffect(() => {
-    if (firstRender && isOffline) setFirstRender(false)
-  }, [isOffline])
+    if (firstRender && isOffline) setFirstRender(false);
+  }, [isOffline]);
 
-  return { isFirstRender: firstRender }
+  return { isFirstRender: firstRender };
 }
 
-export { useFirstRender, useOnlineStatus }
+export { useFirstRender, useOnlineStatus };
