@@ -6,7 +6,6 @@ import {
   useRef,
   useState
 } from 'react'
-import { NetworkInformation } from './network-information-api.d'
 import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
@@ -239,3 +238,26 @@ function useFirstRender(): { isFirstRender: boolean } {
 }
 
 export { useFirstRender, useOnlineStatus }
+
+type Megabit = number
+type Millisecond = number
+type EffectiveConnectionType = '2g' | '3g' | '4g' | 'slow-2g'
+type ConnectionType =
+  | 'bluetooth'
+  | 'cellular'
+  | 'ethernet'
+  | 'mixed'
+  | 'none'
+  | 'other'
+  | 'unknown'
+  | 'wifi'
+  | 'wimax'
+interface NetworkInformation extends EventTarget {
+  readonly type?: ConnectionType
+  readonly effectiveType?: EffectiveConnectionType
+  readonly downlinkMax?: Megabit
+  readonly downlink?: Megabit
+  readonly rtt?: Millisecond
+  readonly saveData?: boolean
+  onchange?: EventListener
+}
