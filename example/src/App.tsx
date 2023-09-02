@@ -19,7 +19,7 @@ type ReducerActions = {
     | 'offlineStatusText'
     | 'duration'
   payload: {
-    position?: any
+    position?
     darkMode?: boolean
     statusText?: { online?: string; offline?: string }
     duration?: number
