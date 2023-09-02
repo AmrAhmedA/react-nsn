@@ -22,7 +22,7 @@ type EventsCallback = {
   onCloseClick: () => void
 }
 
-interface OnlineStatusNotification {
+interface OnlineStatusNotificationProps {
   darkMode?: boolean
   destoryOnClose?: boolean
   duration?: number
@@ -59,7 +59,7 @@ const DefaultOfflineText = 'You are currently offline.'
  */
 const OnlineStatusNotificationComponent = forwardRef<
   HTMLDivElement,
-  OnlineStatusNotification
+  OnlineStatusNotificationProps
 >((props, ref): JSX.Element => {
   const [isOpen, setIsOpen] = React.useState(false)
 
