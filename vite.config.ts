@@ -1,17 +1,18 @@
-import * as packageJson from './package.json'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { PluginOption, defineConfig } from 'vite'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import dts from 'vite-plugin-dts'
+import * as packageJson from './package.json'
 
 export default defineConfig({
   plugins: [
     react({ jsxRuntime: 'classic' }),
     cssInjectedByJsPlugin(),
     dts({
-      insertTypesEntry: true
+      insertTypesEntry: true,
+      rollupTypes: true
     }),
     visualizer({
       template: 'treemap', // or sunburst

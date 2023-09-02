@@ -31,3 +31,5 @@ export function timeSince(date: Date) {
 
   return Math.floor(seconds) + ' seconds'
 }
+
+export const DEFAULT_POLLING_URL = 'https://www.gstatic.com/generate_204'

@@ -1,12 +1,12 @@
-import { NetworkInformation } from './network-information-api'
-import { timeSince } from './utils'
 import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useReducer,
   useRef,
   useState
 } from 'react'
+import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
 
@@ -24,9 +24,83 @@ function getConnectionInfo() {
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-type UseOnlineStatusProps = {
+type OnlineStatusProps = {
   pollingUrl?: string
   pollingDuration?: number
+}
+
+const InitialOnlineStatus =
+  isNavigatorObjectAvailable &&
+  isWindowDocumentAvailable &&
+  typeof navigator?.onLine === 'boolean'
+    ? navigator?.onLine
+    : true
+
+type ReducerActionTypes = 'offline' | 'online'
+type ReducerActions = {
+  type: ReducerActionTypes
+}
+
+type State = {
+  online: boolean
+  time: {
+    since: Date
+    diff: string
+  }
+}
+
+function statusReducer(prevState: State, action: ReducerActions) {
+  let newState: State
+  switch (action.type) {
+    case 'offline': {
+      if (!prevState.online)
+        newState = {
+          ...prevState,
+          online: false,
+          time: {
+            since: prevState.time.since,
+            diff: timeSince(prevState.time.since)
+          }
+        }
+      // previous state is online, recalculate time
+      else if (prevState.online)
+        newState = {
+          ...prevState,
+          online: false,
+          time: {
+            since: new Date(),
+            diff: timeSince(new Date())
+          }
+        }
+    }
+    break
+    case 'online': {
+      if (prevState.online)
+        newState = {
+          ...prevState,
+          online: true,
+          time: {
+            since: prevState.time.since,
+            diff: timeSince(prevState.time.since)
+          }
+        }
+      // previous state is offline, recalculate time
+      else if (!prevState.online) {
+        newState = {
+          ...prevState,
+          online: true,
+          time: {
+            since: new Date(),
+            diff: timeSince(new Date())
+          }
+        }
+      }
+    }
+    break
+    default:
+      newState = { ...prevState }
+  }
+  return newState
 }
 
 /**
@@ -46,26 +120,18 @@ type UseOnlineStatusProps = {
  */
 
 function useOnlineStatus({
-  pollingUrl = 'https://www.gstatic.com/generate_204',
+  pollingUrl = DEFAULT_POLLING_URL,
   pollingDuration = 12000
-}: UseOnlineStatusProps = {}): {
+}: OnlineStatusProps = {}): {
   attributes: { isOnline: boolean }
   connectionInfo: NetworkInformation
-  error: unknown
+  error: Error
   isOffline: boolean
   isOnline: boolean
   time: { since: Date; difference: string }
 } {
-  const [isOnline, setIsOnline] = useState<{
-    online: boolean
-    time: { since: Date; diff: string }
-  }>({
-    online:
-      isNavigatorObjectAvailable &&
-      isWindowDocumentAvailable &&
-      typeof navigator.onLine === 'boolean'
-        ? navigator.onLine
-        : true,
+  const [statusState, dispatch] = useReducer(statusReducer, {
+    online: InitialOnlineStatus,
     time: {
       since: new Date(),
       diff: timeSince(new Date())
@@ -79,42 +145,13 @@ function useOnlineStatus({
       .then(
         (response) =>
           response &&
-          setIsOnline((prevState) => {
-            if (prevState.online) {
-              return {
-                online: true,
-                time: {
-                  since: prevState.time.since,
-                  diff: timeSince(prevState.time.since)
-                }
-              }
-            }
-            return {
-              online: true,
-              time: {
-                since: new Date(),
-                diff: timeSince(new Date())
-              }
-            }
+          dispatch({
+            type: 'online'
           })
       )
       .catch(() => {
-        return setIsOnline((prevState) => {
-          if (!prevState.online)
-            return {
-              online: false,
-              time: {
-                since: prevState.time.since,
-                diff: timeSince(prevState.time.since)
-              }
-            }
-          return {
-            online: false,
-            time: {
-              since: new Date(),
-              diff: timeSince(new Date())
-            }
-          }
+        return dispatch({
+          type: 'offline'
         })
       })
   }, [pollingUrl])
@@ -125,12 +162,8 @@ function useOnlineStatus({
     async ({ type }: Event) => {
       type === 'online'
         ? _onlineStatusFn()
-        : setIsOnline({
-            online: false,
-            time: {
-              since: new Date(),
-              diff: timeSince(new Date())
-            }
+        : dispatch({
+            type: 'offline'
           })
     },
     [_onlineStatusFn]
@@ -148,12 +181,12 @@ function useOnlineStatus({
   }, [handleOnlineStatus])
 
   return {
-    attributes: { isOnline: isOnline.online },
+    attributes: { isOnline: statusState.online },
     connectionInfo,
     error: null,
-    isOffline: !isOnline.online,
-    isOnline: isOnline.online,
-    time: { since: isOnline.time.since, difference: isOnline.time.diff }
+    isOffline: !statusState.online,
+    isOnline: statusState.online,
+    time: { since: statusState.time.since, difference: statusState.time.diff }
   }
 }
 
@@ -205,3 +238,26 @@ function useFirstRender(): { isFirstRender: boolean } {
 }
 
 export { useFirstRender, useOnlineStatus }
+
+type Megabit = number
+type Millisecond = number
+type EffectiveConnectionType = '2g' | '3g' | '4g' | 'slow-2g'
+type ConnectionType =
+  | 'bluetooth'
+  | 'cellular'
+  | 'ethernet'
+  | 'mixed'
+  | 'none'
+  | 'other'
+  | 'unknown'
+  | 'wifi'
+  | 'wimax'
+interface NetworkInformation extends EventTarget {
+  readonly type?: ConnectionType
+  readonly effectiveType?: EffectiveConnectionType
+  readonly downlinkMax?: Megabit
+  readonly downlink?: Megabit
+  readonly rtt?: Millisecond
+  readonly saveData?: boolean
+  onchange?: EventListener
+}

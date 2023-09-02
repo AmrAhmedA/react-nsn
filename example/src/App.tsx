@@ -1,19 +1,15 @@
-import {
-  OnlineStatusNotification,
-  Position,
-  useOnlineStatus
-} from '../../src/nsn'
-import './App.css'
-import { AppBarContainer } from './components/AppBar'
-import { InfoModal } from './components/InfoModal'
-import { DarkModeContainer } from './components/darkMode'
-import { PositionContainer } from './components/position'
 import Alert from '@mui/material/Alert'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import { useReducer, useState } from 'react'
+import { OnlineStatusNotification, useOnlineStatus } from '../../src/nsn'
+import './App.css'
+import { AppBarContainer } from './components/AppBar'
+import { InfoModal } from './components/InfoModal'
+import { DarkModeContainer } from './components/darkMode'
+import { PositionContainer } from './components/position'
 
 type ReducerActions = {
   type:
@@ -23,7 +19,7 @@ type ReducerActions = {
     | 'offlineStatusText'
     | 'duration'
   payload: {
-    position?: Position
+    position?: any
     darkMode?: boolean
     statusText?: { online?: string; offline?: string }
     duration?: number
@@ -33,7 +29,7 @@ type ReducerActions = {
 export type State = {
   darkMode: boolean
   duration: number
-  position: Position
+  position: any
   statusText: {
     online?: string
     offline?: string
