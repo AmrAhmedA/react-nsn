@@ -1,10 +1,9 @@
-import { Position } from '../../../src/OnlineStatusNotification'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-const POSITIONS_ARR: { label: string; position: Position }[] = [
+const POSITIONS_ARR: { label: string; position }[] = [
   {
     label: 'top-left',
     position: 'topLeft'
@@ -33,7 +32,7 @@ const POSITIONS_ARR: { label: string; position: Position }[] = [
 export function PositionContainer({ state, dispatch }) {
   return (
     <>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant='h6' gutterBottom>
         Where do you want to position the notificaiton component?
       </Typography>
       <Grid container>
@@ -50,7 +49,7 @@ export function PositionContainer({ state, dispatch }) {
               <Grid item xs={4} style={{ padding: '8px' }}>
                 <Button
                   fullWidth={true}
-                  variant="outlined"
+                  variant='outlined'
                   disabled={isSelected}
                   onClick={() =>
                     dispatch({
