@@ -6,7 +6,7 @@ import {
   useRef,
   useState
 } from 'react'
-import { NetworkInformation } from './network-information-api'
+import { NetworkInformation } from './network-information-api.d'
 import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
@@ -25,7 +25,7 @@ function getConnectionInfo() {
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-export type OnlineStatusProps = {
+type OnlineStatusProps = {
   pollingUrl?: string
   pollingDuration?: number
 }
