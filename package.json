@@ -1,6 +1,6 @@
 {
   "name": "react-nsn",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "private": false,
   "description": "A very lightweight and customizable online network status notification built for react apps.",
   "license": "MIT",
@@ -40,12 +40,12 @@
     "type-check": "tsc --pretty --noEmit"
   },
   "files": [
-    "dist",
-    "dist/*.css"
+    "dist"
   ],
   "main": "./dist/react-nsn.cjs",
   "module": "./dist/react-nsn.js",
   "source": "src/nsn.ts",
+  "types": "./dist/react-nsn.d.ts",
   "exports": {
     ".": {
       "import": "./dist/react-nsn.js",
