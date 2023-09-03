@@ -1,4 +1,4 @@
-## React Network Status Notification (React-nsn) [![License](https://img.shields.io/npm/l/react-nsn)](https://github.com/AmrAhmedA/react-nsn/blob/main/LICENSE)
+## React Network Status Notification (React-nsn) [![License](https://img.shields.io/npm/l/react-nsn)](https://github.com/AmrAhmedA/react-nsn/blob/main/LICENSE) ![npm](https://img.shields.io/npm/dm/react-nsn)
 
 
 
