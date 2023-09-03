@@ -40,8 +40,7 @@
     "type-check": "tsc --pretty --noEmit"
   },
   "files": [
-    "dist",
-    "dist/*.css"
+    "dist"
   ],
   "main": "./dist/react-nsn.cjs",
   "module": "./dist/react-nsn.js",
