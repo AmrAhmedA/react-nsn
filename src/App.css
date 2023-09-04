@@ -25,6 +25,7 @@
 .statusNotification {
   align-items: center;
   border-radius: 8px;
+  box-sizing: content-box;
   direction: ltr;
   display: flex;
   height: 48px;

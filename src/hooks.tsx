@@ -1,3 +1,4 @@
+import { DEFAULT_POLLING_URL, timeSince } from './utils'
 import {
   useCallback,
   useEffect,
@@ -6,7 +7,6 @@ import {
   useRef,
   useState
 } from 'react'
-import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
 
@@ -22,7 +22,9 @@ function getConnectionInfo() {
 }
 
 const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect
+  typeof window !== 'undefined' || typeof navigator !== 'undefined'
+    ? useLayoutEffect
+    : useEffect
 
 type OnlineStatusProps = {
   pollingUrl?: string
