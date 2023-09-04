@@ -190,6 +190,8 @@ export const OnlineStatusNotification = React.memo(
   OnlineStatusNotificationComponent
 )
 
+export default OnlineStatusNotification
+
 const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
   isOnline
     ? statusText?.online ?? DefaultOnlineText
