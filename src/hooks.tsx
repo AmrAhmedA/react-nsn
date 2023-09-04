@@ -22,7 +22,9 @@ function getConnectionInfo() {
 }
 
 const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect
+  typeof window !== 'undefined' || typeof navigator !== 'undefined'
+    ? useLayoutEffect
+    : useEffect
 
 type OnlineStatusProps = {
   pollingUrl?: string
