@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
@@ -13,30 +6,22 @@ const isWindowDocumentAvailable = typeof window !== 'undefined'
 const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
 
 function getConnectionInfo() {
-  return (
-    navigator['connection'] ||
-    navigator['mozConnection'] ||
-    navigator['webkitConnection'] ||
-    null
-  )
+  if (isNavigatorObjectAvailable)
+    return (
+      navigator?.['connection'] ||
+      navigator?.['mozConnection'] ||
+      navigator?.['webkitConnection'] ||
+      null
+    )
+  return false
 }
-
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' || typeof navigator !== 'undefined'
-    ? useLayoutEffect
-    : useEffect
 
 type OnlineStatusProps = {
   pollingUrl?: string
   pollingDuration?: number
 }
 
-const InitialOnlineStatus =
-  isNavigatorObjectAvailable &&
-  isWindowDocumentAvailable &&
-  typeof navigator?.onLine === 'boolean'
-    ? navigator?.onLine
-    : true
+const InitialOnlineStatus = isNavigatorObjectAvailable ? navigator.onLine : true
 
 type ReducerActionTypes = 'offline' | 'online'
 type ReducerActions = {
@@ -175,12 +160,14 @@ function useOnlineStatus({
 
   // Reactive logic for detecting browser side online/offline
   useEffect(() => {
-    window.addEventListener('online', handleOnlineStatus)
-    window.addEventListener('offline', handleOnlineStatus)
+    if (isWindowDocumentAvailable) {
+      window.addEventListener('online', handleOnlineStatus)
+      window.addEventListener('offline', handleOnlineStatus)
 
-    return () => {
-      window.removeEventListener('online', handleOnlineStatus)
-      window.removeEventListener('offline', handleOnlineStatus)
+      return () => {
+        window.removeEventListener('online', handleOnlineStatus)
+        window.removeEventListener('offline', handleOnlineStatus)
+      }
     }
   }, [handleOnlineStatus])
 
@@ -216,6 +203,7 @@ export function useInterval(
     function tick() {
       savedCallback.current()
     }
+
     if (delay !== null) {
       const id = setInterval(tick, delay)
       return () => clearInterval(id)
@@ -234,7 +222,7 @@ function useFirstRender(): { isFirstRender: boolean } {
   const [firstRender, setFirstRender] = useState(true)
 
   const { isOffline } = useOnlineStatus()
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
     if (firstRender && isOffline) setFirstRender(false)
   }, [isOffline])
 

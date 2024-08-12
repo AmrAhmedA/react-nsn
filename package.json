@@ -93,8 +93,9 @@
     "rollup-plugin-visualizer": "^5.9.2",
     "typescript": "^5.5.4",
     "vite": "^4.5.3",
-    "vue-tsc": "^2.0.29",
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-css-injected-by-js": "^3.5.1",
+    "vite-plugin-dts": "^3.9.1",
+    "vue-tsc": "^2.0.29"
   },
   "peerDependencies": {
     "react": ">=16",
