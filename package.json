@@ -29,7 +29,7 @@
     "clean": "rimraf dist && rimraf --glob node_modules",
     "deploy:npm": "npm publish",
     "dev": "cd example && npm run dev",
-    "format": "rome format src --write",
+    "format": "prettier --write src",
     "git-is-clean": "git status && git diff-index HEAD",
     "lint": "eslint ./src --ext ts --ext tsx --ext js",
     "pre-commit": "lint-staged",
@@ -99,5 +99,8 @@
     "react": ">=16",
     "react-dom": ">=16",
     "react-transition-group": "^4.4.5"
+  },
+  "dependencies": {
+    "prettier-plugin-organize-imports": "^4.0.0"
   }
 }
