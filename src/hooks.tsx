@@ -14,9 +14,9 @@ const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
 
 function getConnectionInfo() {
   return (
-    navigator['connection'] ||
-    navigator['mozConnection'] ||
-    navigator['webkitConnection'] ||
+    navigator?.['connection'] ||
+    navigator?.['mozConnection'] ||
+    navigator?.['webkitConnection'] ||
     null
   )
 }
