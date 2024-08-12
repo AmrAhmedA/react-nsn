@@ -1,12 +1,12 @@
-import { DEFAULT_POLLING_URL, timeSince } from './utils'
 import {
   useCallback,
   useEffect,
   useLayoutEffect,
   useReducer,
   useRef,
-  useState
+  useState,
 } from 'react'
+import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
 
@@ -54,51 +54,53 @@ type State = {
 function statusReducer(prevState: State, action: ReducerActions) {
   let newState: State
   switch (action.type) {
-    case 'offline': {
-      if (!prevState.online)
-        newState = {
-          ...prevState,
-          online: false,
-          time: {
-            since: prevState.time.since,
-            diff: timeSince(prevState.time.since)
+    case 'offline':
+      {
+        if (!prevState.online)
+          newState = {
+            ...prevState,
+            online: false,
+            time: {
+              since: prevState.time.since,
+              diff: timeSince(prevState.time.since),
+            },
           }
-        }
-      // previous state is online, recalculate time
-      else if (prevState.online)
-        newState = {
-          ...prevState,
-          online: false,
-          time: {
-            since: new Date(),
-            diff: timeSince(new Date())
+        // previous state is online, recalculate time
+        else if (prevState.online)
+          newState = {
+            ...prevState,
+            online: false,
+            time: {
+              since: new Date(),
+              diff: timeSince(new Date()),
+            },
           }
-        }
-    }
-    break
-    case 'online': {
-      if (prevState.online)
-        newState = {
-          ...prevState,
-          online: true,
-          time: {
-            since: prevState.time.since,
-            diff: timeSince(prevState.time.since)
+      }
+      break
+    case 'online':
+      {
+        if (prevState.online)
+          newState = {
+            ...prevState,
+            online: true,
+            time: {
+              since: prevState.time.since,
+              diff: timeSince(prevState.time.since),
+            },
           }
-        }
-      // previous state is offline, recalculate time
-      else if (!prevState.online) {
-        newState = {
-          ...prevState,
-          online: true,
-          time: {
-            since: new Date(),
-            diff: timeSince(new Date())
+        // previous state is offline, recalculate time
+        else if (!prevState.online) {
+          newState = {
+            ...prevState,
+            online: true,
+            time: {
+              since: new Date(),
+              diff: timeSince(new Date()),
+            },
           }
         }
       }
-    }
-    break
+      break
     default:
       newState = { ...prevState }
   }
@@ -123,7 +125,7 @@ function statusReducer(prevState: State, action: ReducerActions) {
 
 function useOnlineStatus({
   pollingUrl = DEFAULT_POLLING_URL,
-  pollingDuration = 12000
+  pollingDuration = 12000,
 }: OnlineStatusProps = {}): {
   attributes: { isOnline: boolean }
   connectionInfo: NetworkInformation
@@ -136,8 +138,8 @@ function useOnlineStatus({
     online: InitialOnlineStatus,
     time: {
       since: new Date(),
-      diff: timeSince(new Date())
-    }
+      diff: timeSince(new Date()),
+    },
   })
 
   const connectionInfo = getConnectionInfo()
@@ -148,12 +150,12 @@ function useOnlineStatus({
         (response) =>
           response &&
           dispatch({
-            type: 'online'
-          })
+            type: 'online',
+          }),
       )
       .catch(() => {
         return dispatch({
-          type: 'offline'
+          type: 'offline',
         })
       })
   }, [pollingUrl])
@@ -165,10 +167,10 @@ function useOnlineStatus({
       type === 'online'
         ? _onlineStatusFn()
         : dispatch({
-            type: 'offline'
+            type: 'offline',
           })
     },
-    [_onlineStatusFn]
+    [_onlineStatusFn],
   )
 
   // Reactive logic for detecting browser side online/offline
@@ -188,7 +190,7 @@ function useOnlineStatus({
     error: null,
     isOffline: !statusState.online,
     isOnline: statusState.online,
-    time: { since: statusState.time.since, difference: statusState.time.diff }
+    time: { since: statusState.time.since, difference: statusState.time.diff },
   }
 }
 
@@ -202,7 +204,7 @@ function useOnlineStatus({
  */
 export function useInterval(
   callback: () => Promise<void>,
-  delay: number | null
+  delay: number | null,
 ) {
   const savedCallback = useRef<() => void | null>()
 

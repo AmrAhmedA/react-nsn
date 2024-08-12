@@ -40,7 +40,7 @@
   -webkit-box-align: center;
   -webkit-box-pack: start;
   -webkit-font-smoothing: antialiased;
-  box-shadow: 0 0px 10px 0px rgba(30, 41, 60, 0.2)
+  box-shadow: 0 0px 10px 0px rgba(30, 41, 60, 0.2);
 }
 
 .defaultColor {
@@ -158,10 +158,18 @@
 .fade-appear-active {
   opacity: 1;
   transform: translateY(0%);
-  transition: opacity 260ms, transform 260ms var(--enter-animation);
-  -o-transition: opacity 260ms, transform 260ms var(--enter-animation);
-  -moz-transition: opacity 260ms, transform 260ms var(--enter-animation);
-  -webkit-transition: opacity 260ms, transform 260ms var(--enter-animation);
+  transition:
+    opacity 260ms,
+    transform 260ms var(--enter-animation);
+  -o-transition:
+    opacity 260ms,
+    transform 260ms var(--enter-animation);
+  -moz-transition:
+    opacity 260ms,
+    transform 260ms var(--enter-animation);
+  -webkit-transition:
+    opacity 260ms,
+    transform 260ms var(--enter-animation);
 }
 .fade-enter-done {
   opacity: 1;
@@ -173,10 +181,18 @@
 .fade-exit-active {
   opacity: 0.3;
   transform: translateY(200%);
-  transition: opacity 260ms, transform 260ms var(--exit-animation);
-  -o-transition: opacity 260ms, transform 260ms var(--exit-animation);
-  -moz-transition: opacity 260ms, transform 260ms var(--exit-animation);
-  -webkit-transition: opacity 260ms, transform 260ms var(--exit-animation);
+  transition:
+    opacity 260ms,
+    transform 260ms var(--exit-animation);
+  -o-transition:
+    opacity 260ms,
+    transform 260ms var(--exit-animation);
+  -moz-transition:
+    opacity 260ms,
+    transform 260ms var(--exit-animation);
+  -webkit-transition:
+    opacity 260ms,
+    transform 260ms var(--exit-animation);
 }
 
 .fade-exit-done {

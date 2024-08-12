@@ -1,8 +1,8 @@
+import React, { forwardRef, useEffect } from 'react'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import './App.css'
 import { useFirstRender } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
-import React, { forwardRef, useEffect } from 'react'
-import { CSSTransition, SwitchTransition } from 'react-transition-group'
 
 type StatusText = {
   online?: string
@@ -70,7 +70,7 @@ const OnlineStatusNotificationComponent = forwardRef<
     eventsCallback,
     isOnline,
     position = 'bottomLeft',
-    statusText
+    statusText,
   } = props
 
   const [hovering, setHovering] = React.useState(false)
@@ -88,7 +88,7 @@ const OnlineStatusNotificationComponent = forwardRef<
   const toggleVisibility = (flag: boolean) => setIsOpen(flag)
 
   React.useImperativeHandle(ref, (): any => ({
-    openStatus: () => toggleVisibility(true)
+    openStatus: () => toggleVisibility(true),
   }))
 
   useEffect(() => {
@@ -117,7 +117,7 @@ const OnlineStatusNotificationComponent = forwardRef<
   }
 
   const handleCloseButtonClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
     e.preventDefault()
     e.stopPropagation()
@@ -143,13 +143,13 @@ const OnlineStatusNotificationComponent = forwardRef<
           addEndListener={(done: () => void) => {
             nodeRef.current?.addEventListener('transitionend', done, false)
           }}
-          classNames='fade'
+          classNames="fade"
         >
           <div
             className={classNames(
               'statusNotification',
               darkMode ? 'darkColor' : 'defaultColor',
-              position
+              position,
             )}
             ref={nodeRef}
             onMouseEnter={() => {
@@ -159,13 +159,13 @@ const OnlineStatusNotificationComponent = forwardRef<
               setHovering(false)
             }}
           >
-            <div className='statusNotificationIcon'>
+            <div className="statusNotificationIcon">
               {isOnline ? onlineIcon : offlineIcon}
             </div>
             <div>{getStatusText(isOnline, statusText)}</div>
             {/* refresh link */}
             {!isOnline && (
-              <div className='statusNotificationRefresh'>
+              <div className="statusNotificationRefresh">
                 <span onClick={handleRefreshButtonClick}>Refresh</span>
               </div>
             )}
@@ -173,7 +173,7 @@ const OnlineStatusNotificationComponent = forwardRef<
             <div
               className={classNames(
                 'statusNotificationCloseIcon',
-                darkMode ? 'darkColor' : 'defaultColor'
+                darkMode ? 'darkColor' : 'defaultColor',
               )}
               onClick={handleCloseButtonClick}
             >
@@ -187,14 +187,14 @@ const OnlineStatusNotificationComponent = forwardRef<
 })
 
 export const OnlineStatusNotification = React.memo(
-  OnlineStatusNotificationComponent
+  OnlineStatusNotificationComponent,
 )
 
 export default OnlineStatusNotification
 
 const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
   isOnline
-    ? statusText?.online ?? DefaultOnlineText
-    : statusText?.offline ?? DefaultOfflineText
+    ? (statusText?.online ?? DefaultOnlineText)
+    : (statusText?.offline ?? DefaultOfflineText)
 
 const classNames = (...classes: string[]) => classes.filter(Boolean).join(' ')
