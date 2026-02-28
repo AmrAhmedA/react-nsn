@@ -139,6 +139,7 @@
   cursor: pointer;
   border-radius: 50%;
   padding: 6px;
+  transition: background-color 150ms ease;
 }
 
 .statusNotification > .statusNotificationCloseIcon.defaultColor {
@@ -214,6 +215,18 @@
 .topLeft.fade-exit-active,
 .topRight.fade-exit-active {
   transform: translateY(-20px);
+}
+
+/* Reduced motion: disable slide/fade transitions */
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-exit-active,
+  .topCenter.fade-enter-active,
+  .topCenter.fade-exit-active,
+  .bottomCenter.fade-enter-active,
+  .bottomCenter.fade-exit-active {
+    transition: none;
+  }
 }
 
 /* Mobile: full width at bottom */

@@ -16,13 +16,16 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/__tests__/**', 'src/nsn.ts', 'src/icons.tsx'],
+      exclude: ['src/__tests__/**', 'src/nsn.ts', 'src/headless.ts', 'src/icons.tsx'],
     },
   },
 
   plugins: [
     react(),
-    cssInjectedByJsPlugin(),
+    cssInjectedByJsPlugin({
+      jsAssetsFilterFunction: (outputChunk) =>
+        outputChunk.fileName.startsWith('react-nsn'),
+    }),
     dts({
       insertTypesEntry: true,
       rollupTypes: true,
@@ -38,9 +41,10 @@ export default defineConfig({
 
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/nsn.ts'),
-      name: 'react-nsn',
-      fileName: 'react-nsn',
+      entry: {
+        'react-nsn': resolve(__dirname, 'src/nsn.ts'),
+        headless: resolve(__dirname, 'src/headless.ts'),
+      },
       formats: ['cjs', 'es'],
     },
     rollupOptions: {

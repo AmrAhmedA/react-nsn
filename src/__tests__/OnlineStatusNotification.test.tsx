@@ -1,22 +1,20 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
+import type { OnlineStatusNotificationRef } from '../OnlineStatusNotification'
 import OnlineStatusNotification from '../OnlineStatusNotification'
 
 describe('OnlineStatusNotification', () => {
   describe('rendering', () => {
     it('renders nothing on first render when online', () => {
-      const { container } = render(
-        <OnlineStatusNotification isOnline={true} />,
-      )
+      const { container } = render(<OnlineStatusNotification isOnline={true} />)
       expect(container.firstChild).toBeNull()
     })
 
     it('renders the notification immediately when starting offline', () => {
       render(<OnlineStatusNotification isOnline={false} />)
       expect(screen.getByRole('status')).toBeInTheDocument()
-      expect(
-        screen.getByText('You are currently offline.'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('You are currently offline.')).toBeInTheDocument()
     })
 
     it('displays custom status text', () => {
@@ -30,14 +28,10 @@ describe('OnlineStatusNotification', () => {
     })
 
     it('shows notification when going offline after starting online', () => {
-      const { rerender } = render(
-        <OnlineStatusNotification isOnline={true} />,
-      )
+      const { rerender } = render(<OnlineStatusNotification isOnline={true} />)
       rerender(<OnlineStatusNotification isOnline={false} />)
       expect(screen.getByRole('status')).toBeInTheDocument()
-      expect(
-        screen.getByText('You are currently offline.'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('You are currently offline.')).toBeInTheDocument()
     })
   })
 
@@ -64,12 +58,25 @@ describe('OnlineStatusNotification', () => {
   })
 
   describe('click handlers', () => {
+    it('works with only onCloseClick in eventsCallback', () => {
+      const onCloseClick = vi.fn()
+      render(
+        <OnlineStatusNotification
+          isOnline={false}
+          eventsCallback={{ onCloseClick }}
+        />,
+      )
+
+      fireEvent.click(screen.getByLabelText('Close notification'))
+      expect(onCloseClick).toHaveBeenCalledTimes(1)
+    })
+
     it('calls onRefreshClick callback when refresh is clicked', () => {
       const onRefreshClick = vi.fn()
       render(
         <OnlineStatusNotification
           isOnline={false}
-          eventsCallback={{ onRefreshClick, onCloseClick: vi.fn() }}
+          eventsCallback={{ onRefreshClick }}
         />,
       )
 
@@ -82,7 +89,7 @@ describe('OnlineStatusNotification', () => {
       render(
         <OnlineStatusNotification
           isOnline={false}
-          eventsCallback={{ onRefreshClick: vi.fn(), onCloseClick }}
+          eventsCallback={{ onCloseClick }}
         />,
       )
 
@@ -91,37 +98,128 @@ describe('OnlineStatusNotification', () => {
     })
   })
 
+  describe('imperative handle', () => {
+    it('dismiss() triggers the exiting phase', () => {
+      const ref = React.createRef<OnlineStatusNotificationRef>()
+      render(<OnlineStatusNotification ref={ref} isOnline={false} />)
+
+      expect(screen.getByRole('status')).toBeInTheDocument()
+
+      act(() => {
+        ref.current!.dismiss()
+      })
+
+      expect(screen.getByRole('status')).toHaveClass('fade-exit-active')
+    })
+  })
+
   describe('dark mode', () => {
     it('applies darkColor class when darkMode is true', () => {
-      render(
-        <OnlineStatusNotification isOnline={false} darkMode={true} />,
-      )
+      render(<OnlineStatusNotification isOnline={false} darkMode={true} />)
       expect(screen.getByRole('status')).toHaveClass('darkColor')
     })
 
     it('applies defaultColor class when darkMode is false', () => {
-      render(
-        <OnlineStatusNotification isOnline={false} darkMode={false} />,
-      )
+      render(<OnlineStatusNotification isOnline={false} darkMode={false} />)
       expect(screen.getByRole('status')).toHaveClass('defaultColor')
     })
   })
 
   describe('position', () => {
     it('applies the specified position class', () => {
-      render(
-        <OnlineStatusNotification isOnline={false} position="topRight" />,
-      )
+      render(<OnlineStatusNotification isOnline={false} position="topRight" />)
       expect(screen.getByRole('status')).toHaveClass('topRight')
     })
   })
 
   describe('destroyOnClose', () => {
-    it('renders notification in DOM when destoryOnClose is true and visible', () => {
+    it('renders notification in DOM when destroyOnClose is true and visible', () => {
+      const { container } = render(
+        <OnlineStatusNotification isOnline={false} destroyOnClose={true} />,
+      )
+      expect(container.querySelector('.statusNotification')).toBeTruthy()
+    })
+
+    it('still supports the deprecated destoryOnClose prop', () => {
       const { container } = render(
         <OnlineStatusNotification isOnline={false} destoryOnClose={true} />,
       )
       expect(container.querySelector('.statusNotification')).toBeTruthy()
+    })
+  })
+
+  describe('className and style', () => {
+    it('applies custom className to the notification', () => {
+      render(
+        <OnlineStatusNotification isOnline={false} className="my-custom" />,
+      )
+      expect(screen.getByRole('status')).toHaveClass('my-custom')
+    })
+
+    it('applies inline style to the notification', () => {
+      render(
+        <OnlineStatusNotification
+          isOnline={false}
+          style={{ marginTop: '20px' }}
+        />,
+      )
+      expect(screen.getByRole('status')).toHaveStyle({ marginTop: '20px' })
+    })
+  })
+
+  describe('touch interactions', () => {
+    it('pauses auto-hide on pointerEnter and resumes on pointerLeave', () => {
+      vi.useFakeTimers()
+      render(<OnlineStatusNotification isOnline={false} duration={1000} />)
+      const el = screen.getByRole('status')
+
+      // Wait for entering → visible transition
+      act(() => {
+        vi.advanceTimersByTime(0)
+      })
+
+      fireEvent.pointerEnter(el)
+
+      // Advance past the duration — should NOT dismiss because pointer is active
+      act(() => {
+        vi.advanceTimersByTime(1500)
+      })
+      expect(screen.getByRole('status')).toBeInTheDocument()
+      expect(screen.getByRole('status')).not.toHaveClass('fade-exit-active')
+
+      fireEvent.pointerLeave(el)
+      vi.useRealTimers()
+    })
+
+    it('dismisses on horizontal swipe past threshold', () => {
+      vi.useFakeTimers()
+      const { container } = render(
+        <OnlineStatusNotification isOnline={false} />,
+      )
+      const el = screen.getByRole('status')
+
+      fireEvent.touchStart(el, { touches: [{ clientX: 100, clientY: 100 }] })
+      fireEvent.touchMove(el, { touches: [{ clientX: 200, clientY: 100 }] })
+      fireEvent.touchEnd(el)
+
+      // Wait for swipe-off animation to complete
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+
+      expect(container.querySelector('.statusNotification')).toBeNull()
+      vi.useRealTimers()
+    })
+
+    it('does not dismiss on small swipe', () => {
+      render(<OnlineStatusNotification isOnline={false} />)
+      const el = screen.getByRole('status')
+
+      fireEvent.touchStart(el, { touches: [{ clientX: 100, clientY: 100 }] })
+      fireEvent.touchMove(el, { touches: [{ clientX: 130, clientY: 100 }] })
+      fireEvent.touchEnd(el)
+
+      expect(screen.getByRole('status')).not.toHaveClass('fade-exit-active')
     })
   })
 })

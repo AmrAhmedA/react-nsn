@@ -1,6 +1,6 @@
 {
   "name": "react-nsn",
-  "version": "2.1.3",
+  "version": "2.4.0",
   "private": false,
   "description": "React hook and notification component for detecting online/offline network status. Zero dependencies, SSR-safe, accessible.",
   "license": "MIT",
@@ -58,6 +58,11 @@
       "types": "./dist/react-nsn.d.ts",
       "import": "./dist/react-nsn.js",
       "require": "./dist/react-nsn.cjs"
+    },
+    "./headless": {
+      "types": "./dist/headless.d.ts",
+      "import": "./dist/headless.js",
+      "require": "./dist/headless.cjs"
     }
   },
   "lint-staged": {

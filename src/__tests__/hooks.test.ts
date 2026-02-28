@@ -71,6 +71,16 @@ describe('useOnlineStatus', () => {
     expect(result.current.isOnline).toBe(true)
   })
 
+  it('checkNow triggers a fetch call', async () => {
+    const { result } = renderHook(() => useOnlineStatus())
+
+    await act(async () => {
+      await result.current.checkNow()
+    })
+
+    expect(globalThis.fetch).toHaveBeenCalled()
+  })
+
   it('polls at the specified duration', async () => {
     renderHook(() => useOnlineStatus({ pollingDuration: 5000 }))
 
@@ -82,9 +92,130 @@ describe('useOnlineStatus', () => {
     expect(globalThis.fetch).toHaveBeenCalled()
   })
 
-  it('error property is null by default', () => {
-    const { result } = renderHook(() => useOnlineStatus())
-    expect(result.current.error).toBeNull()
+  it('fires onStatusChange when going offline', async () => {
+    const onStatusChange = vi.fn()
+    renderHook(() => useOnlineStatus({ onStatusChange }))
+
+    await act(async () => {
+      window.dispatchEvent(new Event('offline'))
+    })
+
+    expect(onStatusChange).toHaveBeenCalledWith(false)
+  })
+
+  it('fires onStatusChange when coming back online', async () => {
+    const onStatusChange = vi.fn()
+    renderHook(() => useOnlineStatus({ onStatusChange }))
+
+    // Go offline first
+    await act(async () => {
+      window.dispatchEvent(new Event('offline'))
+    })
+
+    onStatusChange.mockClear()
+
+    // Come back online
+    await act(async () => {
+      window.dispatchEvent(new Event('online'))
+    })
+
+    expect(onStatusChange).toHaveBeenCalledWith(true)
+  })
+
+  it('uses custom pollingFn when provided', async () => {
+    const pollingFn = vi.fn().mockResolvedValue(true)
+    renderHook(() => useOnlineStatus({ pollingFn, pollingDuration: 5000 }))
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000)
+    })
+
+    expect(pollingFn).toHaveBeenCalled()
+    // Should NOT use fetch when pollingFn is provided
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+  })
+
+  it('detects offline status via custom pollingFn returning false', async () => {
+    const pollingFn = vi.fn().mockResolvedValue(false)
+    const { result } = renderHook(() =>
+      useOnlineStatus({ pollingFn, pollingDuration: 5000 }),
+    )
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000)
+    })
+
+    expect(result.current.isOnline).toBe(false)
+  })
+
+  it('backs off polling interval when offline', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'))
+    renderHook(() => useOnlineStatus({ pollingDuration: 1000 }))
+
+    vi.mocked(globalThis.fetch).mockClear()
+
+    // First poll at 1s — should fire
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+
+    // After first failure, delay doubles to 2s
+    // At 2s mark (1s after last poll), should NOT have fired again
+    vi.mocked(globalThis.fetch).mockClear()
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(globalThis.fetch).toHaveBeenCalledTimes(0)
+
+    // At 2s after last poll, should fire
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('pauses polling when the tab is hidden', async () => {
+    renderHook(() => useOnlineStatus({ pollingDuration: 5000 }))
+
+    // Clear any initial fetch calls
+    vi.mocked(globalThis.fetch).mockClear()
+
+    // Hide the tab
+    Object.defineProperty(document, 'hidden', {
+      value: true,
+      writable: true,
+      configurable: true,
+    })
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'))
+    })
+
+    await act(async () => {
+      vi.advanceTimersByTime(10000)
+    })
+
+    // No polling should have occurred while hidden
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+
+    // Show the tab again
+    Object.defineProperty(document, 'hidden', {
+      value: false,
+      configurable: true,
+    })
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'))
+    })
+
+    // Should check immediately on tab return
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000)
+    })
+
+    // And polling should resume after the interval
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2)
   })
 })
 

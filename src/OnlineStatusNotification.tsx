@@ -8,12 +8,12 @@ import React, {
 import './App.css'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
 
-type StatusText = {
+export type StatusText = {
   online?: string
   offline?: string
 }
 
-type Position =
+export type Position =
   | 'topLeft'
   | 'topRight'
   | 'topCenter'
@@ -21,19 +21,28 @@ type Position =
   | 'bottomRight'
   | 'bottomCenter'
 
-type EventsCallback = {
-  onRefreshClick: () => void
-  onCloseClick: () => void
+export type EventsCallback = {
+  onRefreshClick?: () => void
+  onCloseClick?: () => void
 }
 
-interface OnlineStatusNotificationProps {
+export interface OnlineStatusNotificationRef {
+  openStatus: () => void
+  dismiss: () => void
+}
+
+export interface OnlineStatusNotificationProps {
+  className?: string
   darkMode?: boolean
+  destroyOnClose?: boolean
+  /** @deprecated Use `destroyOnClose` instead */
   destoryOnClose?: boolean
   duration?: number
   eventsCallback?: EventsCallback
   isOnline: boolean
   position?: Position
   statusText?: StatusText
+  style?: React.CSSProperties
 }
 
 type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
@@ -41,6 +50,7 @@ type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
 const DefaultOnlineText = 'Your internet connection was restored.'
 const DefaultOfflineText = 'You are currently offline.'
 const TRANSITION_FALLBACK_MS = 400
+const SWIPE_THRESHOLD = 80
 
 /**
  * The notification component will pop up when the network status becomes offline and will popup once again when it goes back online
@@ -54,29 +64,37 @@ const TRANSITION_FALLBACK_MS = 400
  * }
  *
  * ```
+ * @param className additional CSS class name(s) to apply to the notification container
  * @param darkMode toggle dark mode on
- * @param destoryOnClose remove notification from dom when it hides
+ * @param destroyOnClose remove notification from dom when it hides
+ * @param destoryOnClose @deprecated use `destroyOnClose` instead
  * @param duration duration of the notification in ms
- * @param eventsCallback object that contains 2 callbacks that are called when refresh button is clicked or close button clicked
+ * @param eventsCallback object that contains callbacks for refresh and close button clicks
  * @param isOnline status of the app when online
  * @param position customize notification component position
- * @param statusText customize online/offline status objects.
+ * @param statusText customize online/offline status objects
+ * @param style inline styles to apply to the notification container
  * @returns JSX Element
  *
  */
 const OnlineStatusNotificationComponent = forwardRef<
-  HTMLDivElement,
+  OnlineStatusNotificationRef,
   OnlineStatusNotificationProps
 >((props, ref) => {
   const {
+    className: userClassName,
     darkMode = false,
-    destoryOnClose = true,
+    destroyOnClose,
+    destoryOnClose,
     duration = 4500,
     eventsCallback,
     isOnline,
     position = 'bottomLeft',
     statusText,
+    style,
   } = props
+
+  const shouldDestroyOnClose = destroyOnClose ?? destoryOnClose ?? true
 
   const [phase, setPhase] = useState<Phase>('hidden')
   const [hovering, setHovering] = useState(false)
@@ -87,6 +105,14 @@ const OnlineStatusNotificationComponent = forwardRef<
   const isFirstChangeRef = useRef(true)
   const phaseRef = useRef<Phase>(phase)
   phaseRef.current = phase
+
+  // Swipe-to-dismiss tracking (ref-based to avoid re-renders during touchmove)
+  const nodeRef = useRef<HTMLDivElement>(null)
+  const touchActiveRef = useRef(false)
+  const touchStartXRef = useRef(0)
+  const touchStartYRef = useRef(0)
+  const swipeOffsetRef = useRef(0)
+  const baseTransformRef = useRef('')
 
   const isVisible = phase === 'visible'
 
@@ -99,8 +125,9 @@ const OnlineStatusNotificationComponent = forwardRef<
     })
   }, [])
 
-  React.useImperativeHandle(ref, (): any => ({
+  React.useImperativeHandle(ref, () => ({
     openStatus: () => enterNotification(isOnline),
+    dismiss: () => setPhase('exiting'),
   }))
 
   // When isOnline changes, trigger the notification
@@ -157,8 +184,8 @@ const OnlineStatusNotificationComponent = forwardRef<
   const handleRefreshButtonClick = () => {
     if (eventsCallback?.onRefreshClick) {
       eventsCallback.onRefreshClick()
-    } else {
-      location.reload()
+    } else if (typeof window !== 'undefined') {
+      window.location.reload()
     }
   }
 
@@ -173,7 +200,82 @@ const OnlineStatusNotificationComponent = forwardRef<
     setPhase('exiting')
   }
 
-  if (destoryOnClose && phase === 'hidden') return null
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchActiveRef.current = true
+    touchStartXRef.current = e.touches[0].clientX
+    touchStartYRef.current = e.touches[0].clientY
+    swipeOffsetRef.current = 0
+    const el = nodeRef.current
+    if (el) {
+      baseTransformRef.current = window.getComputedStyle(el).transform
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dx = e.touches[0].clientX - touchStartXRef.current
+    const dy = e.touches[0].clientY - touchStartYRef.current
+    // Only track horizontal swipes (ignore vertical scrolling)
+    if (Math.abs(dx) > Math.abs(dy)) {
+      swipeOffsetRef.current = dx
+      const el = nodeRef.current
+      if (el) {
+        const base =
+          baseTransformRef.current !== 'none'
+            ? `${baseTransformRef.current} `
+            : ''
+        el.style.transform = `${base}translateX(${dx}px)`
+        el.style.opacity = `${Math.max(0, 1 - Math.abs(dx) / (SWIPE_THRESHOLD * 2))}`
+        el.style.transition = 'none'
+      }
+    }
+  }
+
+  const handleTouchEnd = () => {
+    touchActiveRef.current = false
+    const offset = swipeOffsetRef.current
+    const el = nodeRef.current
+    swipeOffsetRef.current = 0
+
+    if (Math.abs(offset) >= SWIPE_THRESHOLD) {
+      // Animate off-screen in swipe direction, then dismiss
+      if (el) {
+        const base =
+          baseTransformRef.current !== 'none'
+            ? `${baseTransformRef.current} `
+            : ''
+        const direction = offset > 0 ? '100vw' : '-100vw'
+        el.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out'
+        el.style.transform = `${base}translateX(${direction})`
+        el.style.opacity = '0'
+      }
+      setTimeout(() => {
+        if (el) {
+          el.style.transform = ''
+          el.style.opacity = ''
+          el.style.transition = ''
+        }
+        if (pendingOnlineRef.current !== null) {
+          enterNotification(pendingOnlineRef.current)
+        } else {
+          setPhase('hidden')
+        }
+      }, 200)
+    } else if (el) {
+      // Snap back smoothly
+      el.style.transition = 'transform 150ms ease, opacity 150ms ease'
+      requestAnimationFrame(() => {
+        if (el) {
+          el.style.transform = ''
+          el.style.opacity = ''
+        }
+        setTimeout(() => {
+          if (el) el.style.transition = ''
+        }, 150)
+      })
+    }
+  }
+
+  if (shouldDestroyOnClose && phase === 'hidden') return null
 
   const phaseClass =
     phase === 'entering'
@@ -184,6 +286,7 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   return (
     <div
+      ref={nodeRef}
       role="status"
       aria-live="polite"
       className={classNames(
@@ -191,10 +294,17 @@ const OnlineStatusNotificationComponent = forwardRef<
         darkMode ? 'darkColor' : 'defaultColor',
         position,
         phaseClass,
+        userClassName ?? '',
       )}
+      style={style}
       onTransitionEnd={handleTransitionEnd}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onPointerEnter={() => setHovering(true)}
+      onPointerLeave={() => {
+        if (!touchActiveRef.current) setHovering(false)
+      }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="statusNotificationIcon">
         {displayedOnline ? onlineIcon : offlineIcon}
