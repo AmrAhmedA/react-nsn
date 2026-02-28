@@ -78,13 +78,13 @@ function App() {
 | Name         | Type            | Default   | Description                                                                                                                                                               |
 |------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
 | darkMode        | `boolean`          | `false`   | toggle dark mode |
-| destroyOnClose  | `boolean`          | `true`    | destroy when notification component unmount |
+| destoryOnClose  | `boolean`          | `true`    | remove notification from DOM when it hides |
 | duration        | `number`           | 4500ms    | duration of the notification when it pops up on screen before hiding back |
-| onRefreshClick  | `function`         |           | derived from <code>eventsCallback</code>, callback function triggered when refresh is clicked during offline status  |
-| onCloseClick    | `function`         |           | derived from <code>eventsCallback</code>, callback function triggered when close button is clicked |
-| position        | `string`           | `bottomLeft` | `bottomLeft`  `bottomRight`  `centered`  |
-| statusText.online   | `string`       | Your internet connection was restored.      | add your custom online text |
-| statusText.offline  | `string`       | You are currently offline.      | add your custom offline text
+| eventsCallback.onRefreshClick  | `function`         |           | callback function triggered when refresh is clicked during offline status  |
+| eventsCallback.onCloseClick    | `function`         |           | callback function triggered when close button is clicked |
+| position        | `string`           | `bottomLeft` | `topLeft` `topRight` `topCenter` `bottomLeft` `bottomRight` `bottomCenter`  |
+| statusText.online   | `string`       | Your internet connection was restored.      | custom online text |
+| statusText.offline  | `string`       | You are currently offline.      | custom offline text
 
 ```useOnlineStatus``` hook has the following arguments:
 
