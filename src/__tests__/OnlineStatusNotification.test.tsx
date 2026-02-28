@@ -1,8 +1,8 @@
-import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
+import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import OnlineStatusNotification from '../OnlineStatusNotification'
 import type { OnlineStatusNotificationRef } from '../OnlineStatusNotification'
+import OnlineStatusNotification from '../OnlineStatusNotification'
 
 describe('OnlineStatusNotification', () => {
   describe('rendering', () => {
@@ -164,6 +164,62 @@ describe('OnlineStatusNotification', () => {
         />,
       )
       expect(screen.getByRole('status')).toHaveStyle({ marginTop: '20px' })
+    })
+  })
+
+  describe('touch interactions', () => {
+    it('pauses auto-hide on pointerEnter and resumes on pointerLeave', () => {
+      vi.useFakeTimers()
+      render(<OnlineStatusNotification isOnline={false} duration={1000} />)
+      const el = screen.getByRole('status')
+
+      // Wait for entering → visible transition
+      act(() => {
+        vi.advanceTimersByTime(0)
+      })
+
+      fireEvent.pointerEnter(el)
+
+      // Advance past the duration — should NOT dismiss because pointer is active
+      act(() => {
+        vi.advanceTimersByTime(1500)
+      })
+      expect(screen.getByRole('status')).toBeInTheDocument()
+      expect(screen.getByRole('status')).not.toHaveClass('fade-exit-active')
+
+      fireEvent.pointerLeave(el)
+      vi.useRealTimers()
+    })
+
+    it('dismisses on horizontal swipe past threshold', () => {
+      vi.useFakeTimers()
+      const { container } = render(
+        <OnlineStatusNotification isOnline={false} />,
+      )
+      const el = screen.getByRole('status')
+
+      fireEvent.touchStart(el, { touches: [{ clientX: 100, clientY: 100 }] })
+      fireEvent.touchMove(el, { touches: [{ clientX: 200, clientY: 100 }] })
+      fireEvent.touchEnd(el)
+
+      // Wait for swipe-off animation to complete
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+
+      expect(container.querySelector('.statusNotification')).toBeNull()
+      vi.useRealTimers()
+    })
+
+    it('does not dismiss on small swipe', () => {
+      render(<OnlineStatusNotification isOnline={false} />)
+      const el = screen.getByRole('status')
+
+      fireEvent.touchStart(el, { touches: [{ clientX: 100, clientY: 100 }] })
+      fireEvent.touchMove(el, { touches: [{ clientX: 130, clientY: 100 }] })
+      fireEvent.touchEnd(el)
+
+      expect(screen.getByRole('status')).not.toHaveClass('fade-exit-active')
     })
   })
 })
