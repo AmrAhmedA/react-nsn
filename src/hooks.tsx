@@ -5,15 +5,16 @@ const isWindowDocumentAvailable = typeof window !== 'undefined'
 
 const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
 
-function getConnectionInfo() {
-  if (isNavigatorObjectAvailable)
-    return (
-      navigator?.['connection'] ||
-      navigator?.['mozConnection'] ||
-      navigator?.['webkitConnection'] ||
-      null
-    )
-  return false
+function getConnectionInfo(): NetworkInformation | null {
+  if (isNavigatorObjectAvailable) {
+    const nav: Navigator & {
+      connection?: NetworkInformation
+      mozConnection?: NetworkInformation
+      webkitConnection?: NetworkInformation
+    } = navigator
+    return nav.connection || nav.mozConnection || nav.webkitConnection || null
+  }
+  return null
 }
 
 type OnlineStatusProps = {
@@ -36,60 +37,27 @@ type State = {
   }
 }
 
-function statusReducer(prevState: State, action: ReducerActions) {
-  let newState: State
+function statusReducer(prevState: State, action: ReducerActions): State {
   switch (action.type) {
-    case 'offline':
-      {
-        if (!prevState.online)
-          newState = {
-            ...prevState,
-            online: false,
-            time: {
-              since: prevState.time.since,
-              diff: timeSince(prevState.time.since),
-            },
-          }
-        // previous state is online, recalculate time
-        else if (prevState.online)
-          newState = {
-            ...prevState,
-            online: false,
-            time: {
-              since: new Date(),
-              diff: timeSince(new Date()),
-            },
-          }
+    case 'offline': {
+      const since = prevState.online ? new Date() : prevState.time.since
+      return {
+        ...prevState,
+        online: false,
+        time: { since, diff: timeSince(since) },
       }
-      break
-    case 'online':
-      {
-        if (prevState.online)
-          newState = {
-            ...prevState,
-            online: true,
-            time: {
-              since: prevState.time.since,
-              diff: timeSince(prevState.time.since),
-            },
-          }
-        // previous state is offline, recalculate time
-        else if (!prevState.online) {
-          newState = {
-            ...prevState,
-            online: true,
-            time: {
-              since: new Date(),
-              diff: timeSince(new Date()),
-            },
-          }
-        }
+    }
+    case 'online': {
+      const since = prevState.online ? prevState.time.since : new Date()
+      return {
+        ...prevState,
+        online: true,
+        time: { since, diff: timeSince(since) },
       }
-      break
+    }
     default:
-      newState = { ...prevState }
+      return { ...prevState }
   }
-  return newState
 }
 
 /**
@@ -113,8 +81,8 @@ function useOnlineStatus({
   pollingDuration = 12000,
 }: OnlineStatusProps = {}): {
   attributes: { isOnline: boolean }
-  connectionInfo: NetworkInformation
-  error: Error
+  connectionInfo: NetworkInformation | null
+  error: Error | null
   isOffline: boolean
   isOnline: boolean
   time: { since: Date; difference: string }
@@ -193,7 +161,7 @@ export function useInterval(
   callback: () => Promise<void>,
   delay: number | null,
 ) {
-  const savedCallback = useRef<() => void | null>()
+  const savedCallback = useRef<(() => Promise<void>) | null>(null)
 
   useEffect(() => {
     savedCallback.current = callback
@@ -201,7 +169,7 @@ export function useInterval(
 
   useEffect(() => {
     function tick() {
-      savedCallback.current()
+      savedCallback.current?.()
     }
 
     if (delay !== null) {

@@ -1,4 +1,10 @@
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import './App.css'
 import { useFirstRender } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
@@ -61,7 +67,7 @@ const DefaultOfflineText = 'You are currently offline.'
 const OnlineStatusNotificationComponent = forwardRef<
   HTMLDivElement,
   OnlineStatusNotificationProps
->((props, ref): JSX.Element => {
+>((props, ref) => {
   const {
     darkMode = false,
     destoryOnClose = true,
@@ -76,7 +82,7 @@ const OnlineStatusNotificationComponent = forwardRef<
   const [hovering, setHovering] = useState(false)
   const [displayedOnline, setDisplayedOnline] = useState(isOnline)
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pendingOnlineRef = useRef<boolean | null>(null)
   const phaseRef = useRef<Phase>(phase)
   phaseRef.current = phase
@@ -145,7 +151,7 @@ const OnlineStatusNotificationComponent = forwardRef<
   }
 
   const handleCloseButtonClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault()
     e.stopPropagation()
@@ -167,6 +173,8 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   return (
     <div
+      role="status"
+      aria-live="polite"
       className={classNames(
         'statusNotification',
         darkMode ? 'darkColor' : 'defaultColor',
@@ -180,13 +188,21 @@ const OnlineStatusNotificationComponent = forwardRef<
       <div className="statusNotificationIcon">
         {displayedOnline ? onlineIcon : offlineIcon}
       </div>
-      <div>{getStatusText(displayedOnline, statusText)}</div>
+      <div>{getStatusText(displayedOnline, statusText ?? {})}</div>
       {!displayedOnline && (
         <div className="statusNotificationRefresh">
-          <span onClick={handleRefreshButtonClick}>Refresh</span>
+          <button
+            type="button"
+            aria-label="Refresh the page"
+            onClick={handleRefreshButtonClick}
+          >
+            Refresh
+          </button>
         </div>
       )}
-      <div
+      <button
+        type="button"
+        aria-label="Close notification"
         className={classNames(
           'statusNotificationCloseIcon',
           darkMode ? 'darkColor' : 'defaultColor',
@@ -194,7 +210,7 @@ const OnlineStatusNotificationComponent = forwardRef<
         onClick={handleCloseButtonClick}
       >
         {closeIcon}
-      </div>
+      </button>
     </div>
   )
 })

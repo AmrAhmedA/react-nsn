@@ -99,8 +99,13 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.statusNotification > .statusNotificationRefresh > span {
+.statusNotification > .statusNotificationRefresh > button {
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
   cursor: pointer;
+  padding: 0;
 }
 
 .statusNotification > .statusNotificationRefresh {
@@ -125,12 +130,15 @@
 }
 
 .statusNotification > .statusNotificationCloseIcon {
+  background: none;
+  border: none;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   cursor: pointer;
   border-radius: 50%;
+  padding: 6px;
 }
 
 .statusNotification > .statusNotificationCloseIcon.defaultColor {
