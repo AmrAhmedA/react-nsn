@@ -5,18 +5,14 @@ import OnlineStatusNotification from '../OnlineStatusNotification'
 describe('OnlineStatusNotification', () => {
   describe('rendering', () => {
     it('renders nothing on first render when online', () => {
-      const { container } = render(
-        <OnlineStatusNotification isOnline={true} />,
-      )
+      const { container } = render(<OnlineStatusNotification isOnline={true} />)
       expect(container.firstChild).toBeNull()
     })
 
     it('renders the notification immediately when starting offline', () => {
       render(<OnlineStatusNotification isOnline={false} />)
       expect(screen.getByRole('status')).toBeInTheDocument()
-      expect(
-        screen.getByText('You are currently offline.'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('You are currently offline.')).toBeInTheDocument()
     })
 
     it('displays custom status text', () => {
@@ -30,14 +26,10 @@ describe('OnlineStatusNotification', () => {
     })
 
     it('shows notification when going offline after starting online', () => {
-      const { rerender } = render(
-        <OnlineStatusNotification isOnline={true} />,
-      )
+      const { rerender } = render(<OnlineStatusNotification isOnline={true} />)
       rerender(<OnlineStatusNotification isOnline={false} />)
       expect(screen.getByRole('status')).toBeInTheDocument()
-      expect(
-        screen.getByText('You are currently offline.'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('You are currently offline.')).toBeInTheDocument()
     })
   })
 
@@ -93,31 +85,32 @@ describe('OnlineStatusNotification', () => {
 
   describe('dark mode', () => {
     it('applies darkColor class when darkMode is true', () => {
-      render(
-        <OnlineStatusNotification isOnline={false} darkMode={true} />,
-      )
+      render(<OnlineStatusNotification isOnline={false} darkMode={true} />)
       expect(screen.getByRole('status')).toHaveClass('darkColor')
     })
 
     it('applies defaultColor class when darkMode is false', () => {
-      render(
-        <OnlineStatusNotification isOnline={false} darkMode={false} />,
-      )
+      render(<OnlineStatusNotification isOnline={false} darkMode={false} />)
       expect(screen.getByRole('status')).toHaveClass('defaultColor')
     })
   })
 
   describe('position', () => {
     it('applies the specified position class', () => {
-      render(
-        <OnlineStatusNotification isOnline={false} position="topRight" />,
-      )
+      render(<OnlineStatusNotification isOnline={false} position="topRight" />)
       expect(screen.getByRole('status')).toHaveClass('topRight')
     })
   })
 
   describe('destroyOnClose', () => {
-    it('renders notification in DOM when destoryOnClose is true and visible', () => {
+    it('renders notification in DOM when destroyOnClose is true and visible', () => {
+      const { container } = render(
+        <OnlineStatusNotification isOnline={false} destroyOnClose={true} />,
+      )
+      expect(container.querySelector('.statusNotification')).toBeTruthy()
+    })
+
+    it('still supports the deprecated destoryOnClose prop', () => {
       const { container } = render(
         <OnlineStatusNotification isOnline={false} destoryOnClose={true} />,
       )
