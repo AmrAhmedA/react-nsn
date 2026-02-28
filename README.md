@@ -9,7 +9,7 @@ Component             |  Example
 
 
 <br>
-<p><strong>React-nsn</strong> offers convenient and customizable </p>
+<p><strong>React-nsn</strong> is a zero-dependency, lightweight and customizable library that offers</p>
 
 1. Network status hook `useOnlineStatus()`
    - app online network status
@@ -78,13 +78,13 @@ function App() {
 | Name         | Type            | Default   | Description                                                                                                                                                               |
 |------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
 | darkMode        | `boolean`          | `false`   | toggle dark mode |
-| destroyOnClose  | `boolean`          | `true`    | destroy when notification component unmount |
+| destoryOnClose  | `boolean`          | `true`    | remove notification from DOM when it hides |
 | duration        | `number`           | 4500ms    | duration of the notification when it pops up on screen before hiding back |
-| onRefreshClick  | `function`         |           | derived from <code>eventsCallback</code>, callback function triggered when refresh is clicked during offline status  |
-| onCloseClick    | `function`         |           | derived from <code>eventsCallback</code>, callback function triggered when close button is clicked |
-| position        | `string`           | `bottomLeft` | `bottomLeft`  `bottomRight`  `centered`  |
-| statusText.online   | `string`       | Your internet connection was restored.      | add your custom online text |
-| statusText.offline  | `string`       | You are currently offline.      | add your custom offline text
+| eventsCallback.onRefreshClick  | `function`         |           | callback function triggered when refresh is clicked during offline status  |
+| eventsCallback.onCloseClick    | `function`         |           | callback function triggered when close button is clicked |
+| position        | `string`           | `bottomLeft` | `topLeft` `topRight` `topCenter` `bottomLeft` `bottomRight` `bottomCenter`  |
+| statusText.online   | `string`       | Your internet connection was restored.      | custom online text |
+| statusText.offline  | `string`       | You are currently offline.      | custom offline text
 
 ```useOnlineStatus``` hook has the following arguments:
 
@@ -104,6 +104,21 @@ function App() {
 | connectionInfo    |           |     | The [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API) provides information about the system's connection in terms of general connection type (e.g., 'wifi, 'cellular', etc.). |
 | attributes    | `object`          |     | passed to `<OnlineStatusNotification/>` as prop |
 
+
+### Next.js / Server Components
+
+This library relies on browser APIs (`window`, `navigator`) and React client hooks, so it is **client-side only**. If you are using Next.js App Router, wrap your usage in a client component:
+
+```jsx
+'use client'
+
+import { OnlineStatusNotification, useOnlineStatus } from 'react-nsn'
+
+export default function NetworkStatus() {
+  const { attributes } = useOnlineStatus()
+  return <OnlineStatusNotification {...attributes} />
+}
+```
 
 ### Compatibility
 
