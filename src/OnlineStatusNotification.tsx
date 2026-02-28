@@ -8,12 +8,12 @@ import React, {
 import './App.css'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
 
-type StatusText = {
+export type StatusText = {
   online?: string
   offline?: string
 }
 
-type Position =
+export type Position =
   | 'topLeft'
   | 'topRight'
   | 'topCenter'
@@ -26,8 +26,10 @@ type EventsCallback = {
   onCloseClick: () => void
 }
 
-interface OnlineStatusNotificationProps {
+export interface OnlineStatusNotificationProps {
   darkMode?: boolean
+  destroyOnClose?: boolean
+  /** @deprecated Use `destroyOnClose` instead */
   destoryOnClose?: boolean
   duration?: number
   eventsCallback?: EventsCallback
@@ -55,7 +57,8 @@ const TRANSITION_FALLBACK_MS = 400
  *
  * ```
  * @param darkMode toggle dark mode on
- * @param destoryOnClose remove notification from dom when it hides
+ * @param destroyOnClose remove notification from dom when it hides
+ * @param destoryOnClose @deprecated use `destroyOnClose` instead
  * @param duration duration of the notification in ms
  * @param eventsCallback object that contains 2 callbacks that are called when refresh button is clicked or close button clicked
  * @param isOnline status of the app when online
@@ -70,13 +73,16 @@ const OnlineStatusNotificationComponent = forwardRef<
 >((props, ref) => {
   const {
     darkMode = false,
-    destoryOnClose = true,
+    destroyOnClose,
+    destoryOnClose,
     duration = 4500,
     eventsCallback,
     isOnline,
     position = 'bottomLeft',
     statusText,
   } = props
+
+  const shouldDestroyOnClose = destroyOnClose ?? destoryOnClose ?? true
 
   const [phase, setPhase] = useState<Phase>('hidden')
   const [hovering, setHovering] = useState(false)
@@ -173,7 +179,7 @@ const OnlineStatusNotificationComponent = forwardRef<
     setPhase('exiting')
   }
 
-  if (destoryOnClose && phase === 'hidden') return null
+  if (shouldDestroyOnClose && phase === 'hidden') return null
 
   const phaseClass =
     phase === 'entering'

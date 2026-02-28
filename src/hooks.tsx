@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useReducer, useRef } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
@@ -20,6 +27,7 @@ function getConnectionInfo(): NetworkInformation | null {
 type OnlineStatusProps = {
   pollingUrl?: string
   pollingDuration?: number
+  onStatusChange?: (isOnline: boolean) => void
 }
 
 const InitialOnlineStatus = isNavigatorObjectAvailable ? navigator.onLine : true
@@ -71,22 +79,27 @@ function statusReducer(prevState: State, action: ReducerActions): State {
  * ```
  * @param pollingUrl your custom polling url
  * @param pollingDuration your custom polling duration in ms
+ * @param onStatusChange callback fired when the online status changes (skips initial render)
  * @returns Current network status, connection info,
- * and time since online/offline,
- * attributes to be passed to notification component if used
+ * time since online/offline,
+ * attributes to be passed to notification component if used,
+ * and checkNow to manually trigger a connectivity check
  */
+
+type OnlineStatusResult = {
+  attributes: { isOnline: boolean }
+  checkNow: () => Promise<void>
+  connectionInfo: NetworkInformation | null
+  isOffline: boolean
+  isOnline: boolean
+  time: { since: Date; difference: string }
+}
 
 function useOnlineStatus({
   pollingUrl = DEFAULT_POLLING_URL,
   pollingDuration = 12000,
-}: OnlineStatusProps = {}): {
-  attributes: { isOnline: boolean }
-  connectionInfo: NetworkInformation | null
-  error: Error | null
-  isOffline: boolean
-  isOnline: boolean
-  time: { since: Date; difference: string }
-} {
+  onStatusChange,
+}: OnlineStatusProps = {}): OnlineStatusResult {
   const [statusState, dispatch] = useReducer(statusReducer, {
     online: InitialOnlineStatus,
     time: {
@@ -95,7 +108,7 @@ function useOnlineStatus({
     },
   })
 
-  const connectionInfo = getConnectionInfo()
+  const connectionInfo = useMemo(() => getConnectionInfo(), [])
 
   const _onlineStatusFn = useCallback(async () => {
     await fetch(pollingUrl, { mode: 'no-cors' })
@@ -113,7 +126,20 @@ function useOnlineStatus({
       })
   }, [pollingUrl])
 
-  useInterval(_onlineStatusFn, pollingDuration)
+  const [tabVisible, setTabVisible] = useState(
+    isWindowDocumentAvailable ? !document.hidden : true,
+  )
+
+  useEffect(() => {
+    if (isWindowDocumentAvailable) {
+      const onVisibilityChange = () => setTabVisible(!document.hidden)
+      document.addEventListener('visibilitychange', onVisibilityChange)
+      return () =>
+        document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [])
+
+  useInterval(_onlineStatusFn, tabVisible ? pollingDuration : null)
 
   const handleOnlineStatus = useCallback(
     async ({ type }: Event) => {
@@ -139,10 +165,23 @@ function useOnlineStatus({
     }
   }, [handleOnlineStatus])
 
+  // Fire onStatusChange callback when status changes (skip initial render)
+  const onStatusChangeRef = useRef(onStatusChange)
+  onStatusChangeRef.current = onStatusChange
+  const isInitialRenderRef = useRef(true)
+
+  useEffect(() => {
+    if (isInitialRenderRef.current) {
+      isInitialRenderRef.current = false
+      return
+    }
+    onStatusChangeRef.current?.(statusState.online)
+  }, [statusState.online])
+
   return {
     attributes: { isOnline: statusState.online },
+    checkNow: _onlineStatusFn,
     connectionInfo,
-    error: null,
     isOffline: !statusState.online,
     isOnline: statusState.online,
     time: { since: statusState.time.since, difference: statusState.time.diff },
@@ -180,6 +219,7 @@ export function useInterval(
 }
 
 export { useOnlineStatus }
+export type { OnlineStatusResult }
 
 type Megabit = number
 type Millisecond = number
@@ -194,7 +234,7 @@ type ConnectionType =
   | 'unknown'
   | 'wifi'
   | 'wimax'
-interface NetworkInformation extends EventTarget {
+export interface NetworkInformation extends EventTarget {
   readonly type?: ConnectionType
   readonly effectiveType?: EffectiveConnectionType
   readonly downlinkMax?: Megabit
