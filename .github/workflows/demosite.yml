@@ -1,35 +1,37 @@
-
-name: Build and deploy to Github pages
+name: Deploy demo site
 
 on:
   push:
-    branches:
-      - main
-  pull_request: 
-    branches:
-      - main
-      
-jobs:
-  build-deploy-gh-pages:
-    runs-on: ubuntu-latest
+    branches: [main]
 
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
-        uses: actions/checkout@master
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          persist-credentials: false
-          submodules: true 
-      - name: Install 
-        run: | 
-          npm install
-          cd example 
-          npm install
-      - name: Build 
-        run:  |
-          cd example
-          npm run build:prod
-      - name: Deploy to GH Pages 
-        uses: peaceiris/actions-gh-pages@v3
+          node-version: 22
+          cache: npm
+
+      - name: Install library
+        run: npm ci
+
+      - name: Install example
+        run: npm ci
+        working-directory: example
+
+      - name: Build example
+        run: npm run build:prod
+        working-directory: example
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: example/dist
