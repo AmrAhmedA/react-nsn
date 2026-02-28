@@ -26,7 +26,13 @@ export type EventsCallback = {
   onCloseClick?: () => void
 }
 
+export interface OnlineStatusNotificationRef {
+  openStatus: () => void
+  dismiss: () => void
+}
+
 export interface OnlineStatusNotificationProps {
+  className?: string
   darkMode?: boolean
   destroyOnClose?: boolean
   /** @deprecated Use `destroyOnClose` instead */
@@ -36,6 +42,7 @@ export interface OnlineStatusNotificationProps {
   isOnline: boolean
   position?: Position
   statusText?: StatusText
+  style?: React.CSSProperties
 }
 
 type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
@@ -56,22 +63,25 @@ const TRANSITION_FALLBACK_MS = 400
  * }
  *
  * ```
+ * @param className additional CSS class name(s) to apply to the notification container
  * @param darkMode toggle dark mode on
  * @param destroyOnClose remove notification from dom when it hides
  * @param destoryOnClose @deprecated use `destroyOnClose` instead
  * @param duration duration of the notification in ms
- * @param eventsCallback object that contains 2 callbacks that are called when refresh button is clicked or close button clicked
+ * @param eventsCallback object that contains callbacks for refresh and close button clicks
  * @param isOnline status of the app when online
  * @param position customize notification component position
- * @param statusText customize online/offline status objects.
+ * @param statusText customize online/offline status objects
+ * @param style inline styles to apply to the notification container
  * @returns JSX Element
  *
  */
 const OnlineStatusNotificationComponent = forwardRef<
-  HTMLDivElement,
+  OnlineStatusNotificationRef,
   OnlineStatusNotificationProps
 >((props, ref) => {
   const {
+    className: userClassName,
     darkMode = false,
     destroyOnClose,
     destoryOnClose,
@@ -80,6 +90,7 @@ const OnlineStatusNotificationComponent = forwardRef<
     isOnline,
     position = 'bottomLeft',
     statusText,
+    style,
   } = props
 
   const shouldDestroyOnClose = destroyOnClose ?? destoryOnClose ?? true
@@ -105,7 +116,7 @@ const OnlineStatusNotificationComponent = forwardRef<
     })
   }, [])
 
-  React.useImperativeHandle(ref, (): any => ({
+  React.useImperativeHandle(ref, () => ({
     openStatus: () => enterNotification(isOnline),
     dismiss: () => setPhase('exiting'),
   }))
@@ -164,8 +175,8 @@ const OnlineStatusNotificationComponent = forwardRef<
   const handleRefreshButtonClick = () => {
     if (eventsCallback?.onRefreshClick) {
       eventsCallback.onRefreshClick()
-    } else {
-      location.reload()
+    } else if (typeof window !== 'undefined') {
+      window.location.reload()
     }
   }
 
@@ -198,7 +209,9 @@ const OnlineStatusNotificationComponent = forwardRef<
         darkMode ? 'darkColor' : 'defaultColor',
         position,
         phaseClass,
+        userClassName ?? '',
       )}
+      style={style}
       onTransitionEnd={handleTransitionEnd}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
