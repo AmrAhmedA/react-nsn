@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import React from 'react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import OnlineStatusNotification from '../OnlineStatusNotification'
 
@@ -56,12 +57,25 @@ describe('OnlineStatusNotification', () => {
   })
 
   describe('click handlers', () => {
+    it('works with only onCloseClick in eventsCallback', () => {
+      const onCloseClick = vi.fn()
+      render(
+        <OnlineStatusNotification
+          isOnline={false}
+          eventsCallback={{ onCloseClick }}
+        />,
+      )
+
+      fireEvent.click(screen.getByLabelText('Close notification'))
+      expect(onCloseClick).toHaveBeenCalledTimes(1)
+    })
+
     it('calls onRefreshClick callback when refresh is clicked', () => {
       const onRefreshClick = vi.fn()
       render(
         <OnlineStatusNotification
           isOnline={false}
-          eventsCallback={{ onRefreshClick, onCloseClick: vi.fn() }}
+          eventsCallback={{ onRefreshClick }}
         />,
       )
 
@@ -74,12 +88,27 @@ describe('OnlineStatusNotification', () => {
       render(
         <OnlineStatusNotification
           isOnline={false}
-          eventsCallback={{ onRefreshClick: vi.fn(), onCloseClick }}
+          eventsCallback={{ onCloseClick }}
         />,
       )
 
       fireEvent.click(screen.getByLabelText('Close notification'))
       expect(onCloseClick).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('imperative handle', () => {
+    it('dismiss() triggers the exiting phase', () => {
+      const ref = React.createRef<any>()
+      render(<OnlineStatusNotification ref={ref} isOnline={false} />)
+
+      expect(screen.getByRole('status')).toBeInTheDocument()
+
+      act(() => {
+        ref.current.dismiss()
+      })
+
+      expect(screen.getByRole('status')).toHaveClass('fade-exit-active')
     })
   })
 

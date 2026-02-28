@@ -154,12 +154,15 @@ describe('useOnlineStatus', () => {
       document.dispatchEvent(new Event('visibilitychange'))
     })
 
+    // Should check immediately on tab return
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+
     await act(async () => {
       vi.advanceTimersByTime(5000)
     })
 
-    // Polling should resume
-    expect(globalThis.fetch).toHaveBeenCalled()
+    // And polling should resume after the interval
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2)
   })
 })
 
