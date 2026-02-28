@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
 const isWindowDocumentAvailable = typeof window !== 'undefined'
@@ -179,25 +179,7 @@ export function useInterval(
   }, [delay])
 }
 
-/**
- *
- * @returns flag that indicates if its the first render for the component
- *
- * @internal
- *
- */
-function useFirstRender(): { isFirstRender: boolean } {
-  const [firstRender, setFirstRender] = useState(true)
-
-  const { isOffline } = useOnlineStatus()
-  useEffect(() => {
-    if (firstRender && isOffline) setFirstRender(false)
-  }, [isOffline])
-
-  return { isFirstRender: firstRender }
-}
-
-export { useFirstRender, useOnlineStatus }
+export { useOnlineStatus }
 
 type Megabit = number
 type Millisecond = number
