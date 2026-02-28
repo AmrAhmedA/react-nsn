@@ -6,7 +6,6 @@ import React, {
   useState,
 } from 'react'
 import './App.css'
-import { useFirstRender } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
 
 type StatusText = {
@@ -41,6 +40,7 @@ type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
 
 const DefaultOnlineText = 'Your internet connection was restored.'
 const DefaultOfflineText = 'You are currently offline.'
+const TRANSITION_FALLBACK_MS = 400
 
 /**
  * The notification component will pop up when the network status becomes offline and will popup once again when it goes back online
@@ -84,10 +84,9 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pendingOnlineRef = useRef<boolean | null>(null)
+  const isFirstChangeRef = useRef(true)
   const phaseRef = useRef<Phase>(phase)
   phaseRef.current = phase
-
-  const { isFirstRender } = useFirstRender()
 
   const isVisible = phase === 'visible'
 
@@ -106,7 +105,10 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   // When isOnline changes, trigger the notification
   useEffect(() => {
-    if (isFirstRender) return
+    if (isFirstChangeRef.current) {
+      isFirstChangeRef.current = false
+      if (isOnline) return
+    }
 
     if (phaseRef.current === 'visible' || phaseRef.current === 'entering') {
       // Already showing — exit first, swap content after exit completes
@@ -115,19 +117,29 @@ const OnlineStatusNotificationComponent = forwardRef<
     } else {
       enterNotification(isOnline)
     }
-  }, [isOnline, isFirstRender, enterNotification])
+  }, [isOnline, enterNotification])
+
+  const completeExit = useCallback(() => {
+    if (phaseRef.current !== 'exiting') return
+    if (pendingOnlineRef.current !== null) {
+      enterNotification(pendingOnlineRef.current)
+    } else {
+      setPhase('hidden')
+    }
+  }, [enterNotification])
 
   const handleTransitionEnd = (e: React.TransitionEvent) => {
     if (e.target !== e.currentTarget) return
-
-    if (phaseRef.current === 'exiting') {
-      if (pendingOnlineRef.current !== null) {
-        enterNotification(pendingOnlineRef.current)
-      } else {
-        setPhase('hidden')
-      }
-    }
+    completeExit()
   }
+
+  // Fallback in case transitionend never fires
+  useEffect(() => {
+    if (phase === 'exiting') {
+      const id = setTimeout(completeExit, TRANSITION_FALLBACK_MS)
+      return () => clearTimeout(id)
+    }
+  }, [phase, completeExit])
 
   // Auto-hide after duration
   useEffect(() => {
@@ -161,7 +173,6 @@ const OnlineStatusNotificationComponent = forwardRef<
     setPhase('exiting')
   }
 
-  if (isFirstRender && isOnline) return null
   if (destoryOnClose && phase === 'hidden') return null
 
   const phaseClass =

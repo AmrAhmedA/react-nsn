@@ -1,33 +1,21 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import OnlineStatusNotification from '../OnlineStatusNotification'
-
-vi.mock('../hooks', () => ({
-  useFirstRender: () => ({ isFirstRender: false }),
-}))
-
-beforeEach(() => {
-  vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response())
-})
 
 describe('OnlineStatusNotification', () => {
   describe('rendering', () => {
-    it('renders the notification when offline', () => {
+    it('renders nothing on first render when online', () => {
+      const { container } = render(
+        <OnlineStatusNotification isOnline={true} />,
+      )
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('renders the notification immediately when starting offline', () => {
       render(<OnlineStatusNotification isOnline={false} />)
       expect(screen.getByRole('status')).toBeInTheDocument()
-    })
-
-    it('displays default offline text', () => {
-      render(<OnlineStatusNotification isOnline={false} />)
       expect(
         screen.getByText('You are currently offline.'),
-      ).toBeInTheDocument()
-    })
-
-    it('displays default online text', () => {
-      render(<OnlineStatusNotification isOnline={true} />)
-      expect(
-        screen.getByText('Your internet connection was restored.'),
       ).toBeInTheDocument()
     })
 
@@ -41,20 +29,23 @@ describe('OnlineStatusNotification', () => {
       expect(screen.getByText('No connection!')).toBeInTheDocument()
     })
 
-})
+    it('shows notification when going offline after starting online', () => {
+      const { rerender } = render(
+        <OnlineStatusNotification isOnline={true} />,
+      )
+      rerender(<OnlineStatusNotification isOnline={false} />)
+      expect(screen.getByRole('status')).toBeInTheDocument()
+      expect(
+        screen.getByText('You are currently offline.'),
+      ).toBeInTheDocument()
+    })
+  })
 
   describe('accessibility', () => {
-    it('has role="status" on the container', () => {
+    it('has role="status" and aria-live="polite" on the container', () => {
       render(<OnlineStatusNotification isOnline={false} />)
-      expect(screen.getByRole('status')).toBeInTheDocument()
-    })
-
-    it('has aria-live="polite" on the container', () => {
-      render(<OnlineStatusNotification isOnline={false} />)
-      expect(screen.getByRole('status')).toHaveAttribute(
-        'aria-live',
-        'polite',
-      )
+      const status = screen.getByRole('status')
+      expect(status).toHaveAttribute('aria-live', 'polite')
     })
 
     it('renders the refresh control as a button', () => {
@@ -126,14 +117,10 @@ describe('OnlineStatusNotification', () => {
   })
 
   describe('destroyOnClose', () => {
-    it('removes from DOM when hidden and destoryOnClose is true', () => {
+    it('renders notification in DOM when destoryOnClose is true and visible', () => {
       const { container } = render(
-        <OnlineStatusNotification
-          isOnline={false}
-          destoryOnClose={true}
-        />,
+        <OnlineStatusNotification isOnline={false} destoryOnClose={true} />,
       )
-      // The notification is showing (entering/visible phase)
       expect(container.querySelector('.statusNotification')).toBeTruthy()
     })
   })
