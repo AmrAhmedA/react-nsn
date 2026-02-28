@@ -13,6 +13,11 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts'],
     css: true,
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/__tests__/**', 'src/nsn.ts', 'src/icons.tsx'],
+    },
   },
 
   plugins: [
