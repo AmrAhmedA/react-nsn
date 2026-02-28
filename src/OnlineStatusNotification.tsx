@@ -1,5 +1,4 @@
-import React, { forwardRef, useEffect } from 'react'
-import { CSSTransition, SwitchTransition } from 'react-transition-group'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { useFirstRender } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
@@ -32,6 +31,8 @@ interface OnlineStatusNotificationProps {
   statusText?: StatusText
 }
 
+type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
+
 const DefaultOnlineText = 'Your internet connection was restored.'
 const DefaultOfflineText = 'You are currently offline.'
 
@@ -61,8 +62,6 @@ const OnlineStatusNotificationComponent = forwardRef<
   HTMLDivElement,
   OnlineStatusNotificationProps
 >((props, ref): JSX.Element => {
-  const [isOpen, setIsOpen] = React.useState(false)
-
   const {
     darkMode = false,
     destoryOnClose = true,
@@ -73,40 +72,69 @@ const OnlineStatusNotificationComponent = forwardRef<
     statusText,
   } = props
 
-  const [hovering, setHovering] = React.useState(false)
+  const [phase, setPhase] = useState<Phase>('hidden')
+  const [hovering, setHovering] = useState(false)
+  const [displayedOnline, setDisplayedOnline] = useState(isOnline)
 
-  const onlineRef = React.useRef<HTMLDivElement>(null)
-
-  const offlineRef = React.useRef<HTMLDivElement>(null)
-
-  const timeoutRef = React.useRef(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const pendingReopenRef = useRef(false)
+  const phaseRef = useRef<Phase>(phase)
+  phaseRef.current = phase
 
   const { isFirstRender } = useFirstRender()
 
-  const nodeRef = isOnline ? onlineRef : offlineRef
+  const isVisible = phase === 'visible'
 
-  const toggleVisibility = (flag: boolean) => setIsOpen(flag)
+  const enterNotification = React.useCallback(() => {
+    pendingReopenRef.current = false
+    setPhase('entering')
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setPhase('visible'))
+    })
+  }, [])
 
   React.useImperativeHandle(ref, (): any => ({
-    openStatus: () => toggleVisibility(true),
+    openStatus: () => enterNotification(),
   }))
 
+  // When isOnline changes, trigger the notification
   useEffect(() => {
-    if (!isFirstRender) return toggleVisibility(true)
-  }, [isOnline, isFirstRender])
+    if (isFirstRender) return
 
+    setDisplayedOnline(isOnline)
+
+    if (phaseRef.current === 'visible' || phaseRef.current === 'entering') {
+      pendingReopenRef.current = true
+      setPhase('exiting')
+    } else {
+      enterNotification()
+    }
+  }, [isOnline, isFirstRender, enterNotification])
+
+  const handleTransitionEnd = (e: React.TransitionEvent) => {
+    if (e.target !== e.currentTarget) return
+
+    if (phaseRef.current === 'exiting') {
+      if (pendingReopenRef.current) {
+        enterNotification()
+      } else {
+        setPhase('hidden')
+      }
+    }
+  }
+
+  // Auto-hide after duration
   useEffect(() => {
-    const cleanupFn = () =>
-      timeoutRef.current && clearTimeout(timeoutRef.current)
-
-    if (!hovering && duration > 0 && isOpen) {
+    if (!hovering && duration > 0 && isVisible) {
       timeoutRef.current = setTimeout(() => {
-        toggleVisibility(false)
+        setPhase('exiting')
       }, duration)
 
-      return cleanupFn
+      return () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      }
     }
-  }, [duration, hovering, isOpen, isOnline])
+  }, [duration, hovering, isVisible, isOnline])
 
   const handleRefreshButtonClick = () => {
     if (eventsCallback?.onRefreshClick) {
@@ -124,67 +152,46 @@ const OnlineStatusNotificationComponent = forwardRef<
     if (eventsCallback?.onCloseClick) {
       eventsCallback.onCloseClick()
     }
-    toggleVisibility(false)
+    setPhase('exiting')
   }
 
   if (isFirstRender && isOnline) return null
+  if (destoryOnClose && phase === 'hidden') return null
+
+  const animationClass =
+    phase === 'visible' ? 'fade-enter-active' : 'fade-exit-active'
 
   return (
-    <CSSTransition
-      in={isOpen}
-      timeout={260}
-      nodeRef={nodeRef}
-      appear={true}
-      classNames={'fade'}
-      unmountOnExit={destoryOnClose}
+    <div
+      className={classNames(
+        'statusNotification',
+        darkMode ? 'darkColor' : 'defaultColor',
+        position,
+        animationClass,
+      )}
+      onTransitionEnd={handleTransitionEnd}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
     >
-      <SwitchTransition mode={'out-in'}>
-        <CSSTransition
-          key={isOnline ? 'Online' : 'Offline'}
-          nodeRef={nodeRef}
-          addEndListener={(done: () => void) => {
-            nodeRef.current?.addEventListener('transitionend', done, false)
-          }}
-          classNames="fade"
-        >
-          <div
-            className={classNames(
-              'statusNotification',
-              darkMode ? 'darkColor' : 'defaultColor',
-              position,
-            )}
-            ref={nodeRef}
-            onMouseEnter={() => {
-              setHovering(true)
-            }}
-            onMouseLeave={() => {
-              setHovering(false)
-            }}
-          >
-            <div className="statusNotificationIcon">
-              {isOnline ? onlineIcon : offlineIcon}
-            </div>
-            <div>{getStatusText(isOnline, statusText)}</div>
-            {/* refresh link */}
-            {!isOnline && (
-              <div className="statusNotificationRefresh">
-                <span onClick={handleRefreshButtonClick}>Refresh</span>
-              </div>
-            )}
-            {/* close icon */}
-            <div
-              className={classNames(
-                'statusNotificationCloseIcon',
-                darkMode ? 'darkColor' : 'defaultColor',
-              )}
-              onClick={handleCloseButtonClick}
-            >
-              {closeIcon}
-            </div>
-          </div>
-        </CSSTransition>
-      </SwitchTransition>
-    </CSSTransition>
+      <div className="statusNotificationIcon">
+        {displayedOnline ? onlineIcon : offlineIcon}
+      </div>
+      <div>{getStatusText(displayedOnline, statusText)}</div>
+      {!displayedOnline && (
+        <div className="statusNotificationRefresh">
+          <span onClick={handleRefreshButtonClick}>Refresh</span>
+        </div>
+      )}
+      <div
+        className={classNames(
+          'statusNotificationCloseIcon',
+          darkMode ? 'darkColor' : 'defaultColor',
+        )}
+        onClick={handleCloseButtonClick}
+      >
+        {closeIcon}
+      </div>
+    </div>
   )
 })
 
