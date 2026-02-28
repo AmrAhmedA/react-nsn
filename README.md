@@ -9,7 +9,7 @@ Component             |  Example
 
 
 <br>
-<p><strong>React-nsn</strong> offers convenient and customizable </p>
+<p><strong>React-nsn</strong> is a zero-dependency, lightweight and customizable library that offers</p>
 
 1. Network status hook `useOnlineStatus()`
    - app online network status

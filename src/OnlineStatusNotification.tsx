@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { useFirstRender } from './hooks'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
@@ -77,7 +77,7 @@ const OnlineStatusNotificationComponent = forwardRef<
   const [displayedOnline, setDisplayedOnline] = useState(isOnline)
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
-  const pendingReopenRef = useRef(false)
+  const pendingOnlineRef = useRef<boolean | null>(null)
   const phaseRef = useRef<Phase>(phase)
   phaseRef.current = phase
 
@@ -85,8 +85,9 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   const isVisible = phase === 'visible'
 
-  const enterNotification = React.useCallback(() => {
-    pendingReopenRef.current = false
+  const enterNotification = useCallback((online: boolean) => {
+    setDisplayedOnline(online)
+    pendingOnlineRef.current = null
     setPhase('entering')
     requestAnimationFrame(() => {
       requestAnimationFrame(() => setPhase('visible'))
@@ -94,20 +95,19 @@ const OnlineStatusNotificationComponent = forwardRef<
   }, [])
 
   React.useImperativeHandle(ref, (): any => ({
-    openStatus: () => enterNotification(),
+    openStatus: () => enterNotification(isOnline),
   }))
 
   // When isOnline changes, trigger the notification
   useEffect(() => {
     if (isFirstRender) return
 
-    setDisplayedOnline(isOnline)
-
     if (phaseRef.current === 'visible' || phaseRef.current === 'entering') {
-      pendingReopenRef.current = true
+      // Already showing — exit first, swap content after exit completes
+      pendingOnlineRef.current = isOnline
       setPhase('exiting')
     } else {
-      enterNotification()
+      enterNotification(isOnline)
     }
   }, [isOnline, isFirstRender, enterNotification])
 
@@ -115,8 +115,8 @@ const OnlineStatusNotificationComponent = forwardRef<
     if (e.target !== e.currentTarget) return
 
     if (phaseRef.current === 'exiting') {
-      if (pendingReopenRef.current) {
-        enterNotification()
+      if (pendingOnlineRef.current !== null) {
+        enterNotification(pendingOnlineRef.current)
       } else {
         setPhase('hidden')
       }
@@ -158,8 +158,12 @@ const OnlineStatusNotificationComponent = forwardRef<
   if (isFirstRender && isOnline) return null
   if (destoryOnClose && phase === 'hidden') return null
 
-  const animationClass =
-    phase === 'visible' ? 'fade-enter-active' : 'fade-exit-active'
+  const phaseClass =
+    phase === 'entering'
+      ? 'fade-initial'
+      : phase === 'visible'
+        ? 'fade-enter-active'
+        : 'fade-exit-active'
 
   return (
     <div
@@ -167,7 +171,7 @@ const OnlineStatusNotificationComponent = forwardRef<
         'statusNotification',
         darkMode ? 'darkColor' : 'defaultColor',
         position,
-        animationClass,
+        phaseClass,
       )}
       onTransitionEnd={handleTransitionEnd}
       onMouseEnter={() => setHovering(true)}
