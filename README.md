@@ -15,14 +15,19 @@ Component             |  Example
    - app online network status
    - status time info
    - network information
-   - custom polling
+   - custom polling with exponential backoff
+   - `onStatusChange` callback
+   - `checkNow()` for manual connectivity checks
+   - custom `pollingFn` for your own health-check logic
 2. Notification component `<OnlineStatusNotification/>`
+3. **Headless mode** — use only the hook without the notification UI (~1.4KB gzipped)
 
 
 Table of Contents
 --
 - [Online demo](#online-demo)
 - [How to use](#how-to-use)
+- [Headless mode](#headless-mode)
 - [Documentation](#documentation)
 - [Compatibility](#compatibility)
 - [License](#license)
@@ -44,7 +49,7 @@ npm i react-nsn
 
 ### How to use
 
-add `<OnlineStatusNotification/>` to your app, preferably at root level. 
+add `<OnlineStatusNotification/>` to your app, preferably at root level.
 ```jsx
 import { OnlineStatusNotification, useOnlineStatus } from 'react-nsn'
 
@@ -71,38 +76,61 @@ function App() {
   )
 }
 ```
+
+### Headless mode
+
+If you only need the hook without the notification component, import from `react-nsn/headless` for a smaller bundle (~1.4KB gzipped vs ~10.7KB):
+
+```jsx
+import { useOnlineStatus } from 'react-nsn/headless'
+
+function App() {
+  const { isOnline, checkNow } = useOnlineStatus({
+    onStatusChange: (online) => console.log('Status changed:', online),
+  })
+
+  return <p>{isOnline ? 'Online' : 'Offline'}</p>
+}
+```
   
 ### Documentation
 ```<OnlineStatusNotification/>``` has the following props:
 
 | Name         | Type            | Default   | Description                                                                                                                                                               |
 |------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
+| className       | `string`           |           | additional CSS class name(s) for the notification container |
 | darkMode        | `boolean`          | `false`   | toggle dark mode |
-| destoryOnClose  | `boolean`          | `true`    | remove notification from DOM when it hides |
+| destroyOnClose  | `boolean`          | `true`    | remove notification from DOM when it hides |
 | duration        | `number`           | 4500ms    | duration of the notification when it pops up on screen before hiding back |
-| eventsCallback.onRefreshClick  | `function`         |           | callback function triggered when refresh is clicked during offline status  |
-| eventsCallback.onCloseClick    | `function`         |           | callback function triggered when close button is clicked |
+| eventsCallback.onRefreshClick  | `function`         |           | callback triggered when refresh is clicked during offline status  |
+| eventsCallback.onCloseClick    | `function`         |           | callback triggered when close button is clicked |
 | position        | `string`           | `bottomLeft` | `topLeft` `topRight` `topCenter` `bottomLeft` `bottomRight` `bottomCenter`  |
 | statusText.online   | `string`       | Your internet connection was restored.      | custom online text |
-| statusText.offline  | `string`       | You are currently offline.      | custom offline text
+| statusText.offline  | `string`       | You are currently offline.      | custom offline text |
+| style           | `CSSProperties`    |           | inline styles for the notification container |
+
+The component exposes an imperative handle via `ref` with `openStatus()` and `dismiss()` methods.
 
 ```useOnlineStatus``` hook has the following arguments:
 
 | Name         | Type            | Default   | Description                                                                                                                                                               |
 |------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
-| pollingUrl        | `string`          | `https://www.gstatic.com/generate_204`   | the url used to perform [polling](https://en.wikipedia.org/wiki/Polling_(computer_science)) | 
-| pollingDuration   | `number`          | 12000ms    | fixed delays time between requests |
+| pollingUrl        | `string`          | `https://www.gstatic.com/generate_204`   | url used to perform [polling](https://en.wikipedia.org/wiki/Polling_(computer_science)) |
+| pollingDuration   | `number`          | 12000ms    | base delay between requests (backs off exponentially when offline, capped at 60s) |
+| pollingFn         | `() => Promise<boolean>` |        | custom connectivity check — return `true` if online, `false` if offline. Overrides `pollingUrl` |
+| onStatusChange    | `(isOnline: boolean) => void` |   | callback fired when status changes (skips initial render) |
 
 ```useOnlineStatus``` hook offers the following:
 
-| Name         | Type            | Default   | Description                                                                                                                                                               |
-|------------  |---------------  |---------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
-| isOnline        | `boolean`          |    | app online status | 
-| isOffline   | `boolean`          |     | app offline status |
-| time.since    | `Date`          |     | specifies the date of the last status |
-| time.difference    | `string`          |     | the difference in time between latest network status and the current time |
-| connectionInfo    |           |     | The [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API) provides information about the system's connection in terms of general connection type (e.g., 'wifi, 'cellular', etc.). |
-| attributes    | `object`          |     | passed to `<OnlineStatusNotification/>` as prop |
+| Name         | Type            | Description                                                                                                                                                               |
+|------------  |---------------  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
+| isOnline        | `boolean`          | app online status |
+| isOffline   | `boolean`          | app offline status |
+| checkNow    | `() => Promise<void>` | manually trigger a connectivity check |
+| time.since    | `Date`          | date of the last status change |
+| time.difference    | `string`          | human-readable time since last status change |
+| connectionInfo    | `NetworkInformation \| null` | [Network Information API](https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API) data (connection type, effective type, etc.) |
+| attributes    | `object`          | pass directly to `<OnlineStatusNotification/>` as props |
 
 
 ### Next.js / Server Components
