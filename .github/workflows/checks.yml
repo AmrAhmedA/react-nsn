@@ -81,47 +81,47 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check tag doesn't already exist
+      - name: Check if already published
         if: steps.version.outputs.changed == 'true'
-        id: tag-check
+        id: npm-check
         run: |
-          TAG="v${{ steps.version.outputs.current }}"
-          if git ls-remote --tags origin "refs/tags/$TAG" | grep -q "$TAG"; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
+          VERSION="${{ steps.version.outputs.current }}"
+          if npm view "react-nsn@$VERSION" version 2>/dev/null; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "published=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create git tag
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
+        if: steps.version.outputs.changed == 'true' && steps.npm-check.outputs.published == 'false'
         run: |
           TAG="v${{ steps.version.outputs.current }}"
-          git tag "$TAG"
-          git push origin "$TAG"
+          git tag "$TAG" 2>/dev/null || true
+          git push origin "$TAG" 2>/dev/null || true
 
       - uses: actions/setup-node@v4
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
+        if: steps.version.outputs.changed == 'true' && steps.npm-check.outputs.published == 'false'
         with:
           node-version: 22
           cache: npm
           registry-url: https://registry.npmjs.org
 
       - name: Install & Build
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
+        if: steps.version.outputs.changed == 'true' && steps.npm-check.outputs.published == 'false'
         run: |
           npm ci
           npm run build
 
       - name: Publish to npm
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
+        if: steps.version.outputs.changed == 'true' && steps.npm-check.outputs.published == 'false'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
-        if: steps.version.outputs.changed == 'true' && steps.tag-check.outputs.exists == 'false'
+        if: steps.version.outputs.changed == 'true' && steps.npm-check.outputs.published == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="v${{ steps.version.outputs.current }}"
-          gh release create "$TAG" --generate-notes
+          gh release create "$TAG" --generate-notes 2>/dev/null || true
