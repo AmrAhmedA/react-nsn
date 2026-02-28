@@ -106,14 +106,14 @@ const OnlineStatusNotificationComponent = forwardRef<
 
       return cleanupFn
     }
-    // eslint-disable-next-line no-restricted-globals
   }, [duration, hovering, isOpen, isOnline])
 
   const handleRefreshButtonClick = () => {
-    // eslint-disable-next-line no-restricted-globals
-    eventsCallback.onRefreshClick
-      ? eventsCallback.onRefreshClick()
-      : location.reload()
+    if (eventsCallback?.onRefreshClick) {
+      eventsCallback.onRefreshClick()
+    } else {
+      location.reload()
+    }
   }
 
   const handleCloseButtonClick = (
@@ -121,7 +121,9 @@ const OnlineStatusNotificationComponent = forwardRef<
   ) => {
     e.preventDefault()
     e.stopPropagation()
-    eventsCallback?.onCloseClick && eventsCallback.onCloseClick()
+    if (eventsCallback?.onCloseClick) {
+      eventsCallback.onCloseClick()
+    }
     toggleVisibility(false)
   }
 

@@ -1,26 +1,26 @@
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { PluginOption, defineConfig } from 'vite'
+import { defineConfig, type PluginOption } from 'vite'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import dts from 'vite-plugin-dts'
-import * as packageJson from './package.json'
+import packageJson from './package.json' with { type: 'json' }
 
 export default defineConfig({
   plugins: [
-    react({ jsxRuntime: 'classic' }),
+    react(),
     cssInjectedByJsPlugin(),
     dts({
       insertTypesEntry: true,
-      rollupTypes: true
+      rollupTypes: true,
     }),
     visualizer({
-      template: 'treemap', // or sunburst
+      template: 'treemap',
       open: true,
       gzipSize: true,
       brotliSize: true,
-      filename: 'analyse.html' // will be saved in project's root
-    }) as PluginOption
+      filename: 'analyse.html',
+    }) as PluginOption,
   ],
 
   build: {
@@ -28,7 +28,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/nsn.ts'),
       name: 'react-nsn',
       fileName: 'react-nsn',
-      formats: ['cjs', 'es']
+      formats: ['cjs', 'es'],
     },
     rollupOptions: {
       external: [...Object.keys(packageJson.peerDependencies)],
@@ -36,9 +36,9 @@ export default defineConfig({
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
-          'react-transition-group': 'ReactTransitionGroup'
-        }
-      }
-    }
-  }
+          'react-transition-group': 'ReactTransitionGroup',
+        },
+      },
+    },
+  },
 })

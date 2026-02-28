@@ -149,11 +149,11 @@ function useOnlineStatus({
 
   const handleOnlineStatus = useCallback(
     async ({ type }: Event) => {
-      type === 'online'
-        ? _onlineStatusFn()
-        : dispatch({
-            type: 'offline',
-          })
+      if (type === 'online') {
+        _onlineStatusFn()
+      } else {
+        dispatch({ type: 'offline' })
+      }
     },
     [_onlineStatusFn],
   )
