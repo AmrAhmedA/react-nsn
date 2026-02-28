@@ -21,9 +21,9 @@ export type Position =
   | 'bottomRight'
   | 'bottomCenter'
 
-type EventsCallback = {
-  onRefreshClick: () => void
-  onCloseClick: () => void
+export type EventsCallback = {
+  onRefreshClick?: () => void
+  onCloseClick?: () => void
 }
 
 export interface OnlineStatusNotificationProps {
@@ -107,6 +107,7 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   React.useImperativeHandle(ref, (): any => ({
     openStatus: () => enterNotification(isOnline),
+    dismiss: () => setPhase('exiting'),
   }))
 
   // When isOnline changes, trigger the notification

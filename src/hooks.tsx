@@ -64,7 +64,7 @@ function statusReducer(prevState: State, action: ReducerActions): State {
       }
     }
     default:
-      return { ...prevState }
+      return prevState
   }
 }
 
@@ -111,19 +111,12 @@ function useOnlineStatus({
   const connectionInfo = useMemo(() => getConnectionInfo(), [])
 
   const _onlineStatusFn = useCallback(async () => {
-    await fetch(pollingUrl, { mode: 'no-cors' })
-      .then(
-        (response) =>
-          response &&
-          dispatch({
-            type: 'online',
-          }),
-      )
-      .catch(() => {
-        return dispatch({
-          type: 'offline',
-        })
-      })
+    try {
+      await fetch(pollingUrl, { mode: 'no-cors' })
+      dispatch({ type: 'online' })
+    } catch {
+      dispatch({ type: 'offline' })
+    }
   }, [pollingUrl])
 
   const [tabVisible, setTabVisible] = useState(
@@ -132,17 +125,21 @@ function useOnlineStatus({
 
   useEffect(() => {
     if (isWindowDocumentAvailable) {
-      const onVisibilityChange = () => setTabVisible(!document.hidden)
+      const onVisibilityChange = () => {
+        const visible = !document.hidden
+        setTabVisible(visible)
+        if (visible) _onlineStatusFn()
+      }
       document.addEventListener('visibilitychange', onVisibilityChange)
       return () =>
         document.removeEventListener('visibilitychange', onVisibilityChange)
     }
-  }, [])
+  }, [_onlineStatusFn])
 
   useInterval(_onlineStatusFn, tabVisible ? pollingDuration : null)
 
   const handleOnlineStatus = useCallback(
-    async ({ type }: Event) => {
+    ({ type }: Event) => {
       if (type === 'online') {
         _onlineStatusFn()
       } else {
