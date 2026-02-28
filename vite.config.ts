@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -7,6 +8,13 @@ import dts from 'vite-plugin-dts'
 import packageJson from './package.json' with { type: 'json' }
 
 export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/__tests__/setup.ts'],
+    css: true,
+  },
+
   plugins: [
     react(),
     cssInjectedByJsPlugin(),
