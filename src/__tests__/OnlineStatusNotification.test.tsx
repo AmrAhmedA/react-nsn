@@ -2,6 +2,7 @@ import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import OnlineStatusNotification from '../OnlineStatusNotification'
+import type { OnlineStatusNotificationRef } from '../OnlineStatusNotification'
 
 describe('OnlineStatusNotification', () => {
   describe('rendering', () => {
@@ -99,13 +100,13 @@ describe('OnlineStatusNotification', () => {
 
   describe('imperative handle', () => {
     it('dismiss() triggers the exiting phase', () => {
-      const ref = React.createRef<any>()
+      const ref = React.createRef<OnlineStatusNotificationRef>()
       render(<OnlineStatusNotification ref={ref} isOnline={false} />)
 
       expect(screen.getByRole('status')).toBeInTheDocument()
 
       act(() => {
-        ref.current.dismiss()
+        ref.current!.dismiss()
       })
 
       expect(screen.getByRole('status')).toHaveClass('fade-exit-active')
@@ -144,6 +145,25 @@ describe('OnlineStatusNotification', () => {
         <OnlineStatusNotification isOnline={false} destoryOnClose={true} />,
       )
       expect(container.querySelector('.statusNotification')).toBeTruthy()
+    })
+  })
+
+  describe('className and style', () => {
+    it('applies custom className to the notification', () => {
+      render(
+        <OnlineStatusNotification isOnline={false} className="my-custom" />,
+      )
+      expect(screen.getByRole('status')).toHaveClass('my-custom')
+    })
+
+    it('applies inline style to the notification', () => {
+      render(
+        <OnlineStatusNotification
+          isOnline={false}
+          style={{ marginTop: '20px' }}
+        />,
+      )
+      expect(screen.getByRole('status')).toHaveStyle({ marginTop: '20px' })
     })
   })
 })

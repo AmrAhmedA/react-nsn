@@ -27,6 +27,7 @@ function getConnectionInfo(): NetworkInformation | null {
 type OnlineStatusProps = {
   pollingUrl?: string
   pollingDuration?: number
+  pollingFn?: () => Promise<boolean>
   onStatusChange?: (isOnline: boolean) => void
 }
 
@@ -79,6 +80,7 @@ function statusReducer(prevState: State, action: ReducerActions): State {
  * ```
  * @param pollingUrl your custom polling url
  * @param pollingDuration your custom polling duration in ms
+ * @param pollingFn custom async function for connectivity checks — should return `true` if online, `false` if offline. Overrides `pollingUrl` when provided
  * @param onStatusChange callback fired when the online status changes (skips initial render)
  * @returns Current network status, connection info,
  * time since online/offline,
@@ -98,6 +100,7 @@ type OnlineStatusResult = {
 function useOnlineStatus({
   pollingUrl = DEFAULT_POLLING_URL,
   pollingDuration = 12000,
+  pollingFn,
   onStatusChange,
 }: OnlineStatusProps = {}): OnlineStatusResult {
   const [statusState, dispatch] = useReducer(statusReducer, {
@@ -110,14 +113,31 @@ function useOnlineStatus({
 
   const connectionInfo = useMemo(() => getConnectionInfo(), [])
 
+  const pollingFnRef = useRef(pollingFn)
+  pollingFnRef.current = pollingFn
+
+  const [effectiveDelay, setEffectiveDelay] = useState(pollingDuration)
+
   const _onlineStatusFn = useCallback(async () => {
     try {
-      await fetch(pollingUrl, { mode: 'no-cors' })
-      dispatch({ type: 'online' })
+      if (pollingFnRef.current) {
+        const online = await pollingFnRef.current()
+        dispatch({ type: online ? 'online' : 'offline' })
+        if (online) {
+          setEffectiveDelay(pollingDuration)
+        } else {
+          setEffectiveDelay((prev) => Math.min(prev * 2, 60000))
+        }
+      } else {
+        await fetch(pollingUrl, { mode: 'no-cors' })
+        dispatch({ type: 'online' })
+        setEffectiveDelay(pollingDuration)
+      }
     } catch {
       dispatch({ type: 'offline' })
+      setEffectiveDelay((prev) => Math.min(prev * 2, 60000))
     }
-  }, [pollingUrl])
+  }, [pollingUrl, pollingDuration])
 
   const [tabVisible, setTabVisible] = useState(
     isWindowDocumentAvailable ? !document.hidden : true,
@@ -136,7 +156,7 @@ function useOnlineStatus({
     }
   }, [_onlineStatusFn])
 
-  useInterval(_onlineStatusFn, tabVisible ? pollingDuration : null)
+  useInterval(_onlineStatusFn, tabVisible ? effectiveDelay : null)
 
   const handleOnlineStatus = useCallback(
     ({ type }: Event) => {

@@ -122,6 +122,59 @@ describe('useOnlineStatus', () => {
     expect(onStatusChange).toHaveBeenCalledWith(true)
   })
 
+  it('uses custom pollingFn when provided', async () => {
+    const pollingFn = vi.fn().mockResolvedValue(true)
+    renderHook(() => useOnlineStatus({ pollingFn, pollingDuration: 5000 }))
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000)
+    })
+
+    expect(pollingFn).toHaveBeenCalled()
+    // Should NOT use fetch when pollingFn is provided
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+  })
+
+  it('detects offline status via custom pollingFn returning false', async () => {
+    const pollingFn = vi.fn().mockResolvedValue(false)
+    const { result } = renderHook(() =>
+      useOnlineStatus({ pollingFn, pollingDuration: 5000 }),
+    )
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000)
+    })
+
+    expect(result.current.isOnline).toBe(false)
+  })
+
+  it('backs off polling interval when offline', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'))
+    renderHook(() => useOnlineStatus({ pollingDuration: 1000 }))
+
+    vi.mocked(globalThis.fetch).mockClear()
+
+    // First poll at 1s — should fire
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+
+    // After first failure, delay doubles to 2s
+    // At 2s mark (1s after last poll), should NOT have fired again
+    vi.mocked(globalThis.fetch).mockClear()
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(globalThis.fetch).toHaveBeenCalledTimes(0)
+
+    // At 2s after last poll, should fire
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+  })
+
   it('pauses polling when the tab is hidden', async () => {
     renderHook(() => useOnlineStatus({ pollingDuration: 5000 }))
 
