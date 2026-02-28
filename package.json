@@ -1,6 +1,6 @@
 {
   "name": "react-nsn",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "private": false,
   "description": "React hook and notification component for detecting online/offline network status. Zero dependencies, SSR-safe, accessible.",
   "license": "MIT",

@@ -50,6 +50,7 @@ type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
 const DefaultOnlineText = 'Your internet connection was restored.'
 const DefaultOfflineText = 'You are currently offline.'
 const TRANSITION_FALLBACK_MS = 400
+const SWIPE_THRESHOLD = 80
 
 /**
  * The notification component will pop up when the network status becomes offline and will popup once again when it goes back online
@@ -104,6 +105,14 @@ const OnlineStatusNotificationComponent = forwardRef<
   const isFirstChangeRef = useRef(true)
   const phaseRef = useRef<Phase>(phase)
   phaseRef.current = phase
+
+  // Swipe-to-dismiss tracking (ref-based to avoid re-renders during touchmove)
+  const nodeRef = useRef<HTMLDivElement>(null)
+  const touchActiveRef = useRef(false)
+  const touchStartXRef = useRef(0)
+  const touchStartYRef = useRef(0)
+  const swipeOffsetRef = useRef(0)
+  const baseTransformRef = useRef('')
 
   const isVisible = phase === 'visible'
 
@@ -191,6 +200,81 @@ const OnlineStatusNotificationComponent = forwardRef<
     setPhase('exiting')
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchActiveRef.current = true
+    touchStartXRef.current = e.touches[0].clientX
+    touchStartYRef.current = e.touches[0].clientY
+    swipeOffsetRef.current = 0
+    const el = nodeRef.current
+    if (el) {
+      baseTransformRef.current = window.getComputedStyle(el).transform
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dx = e.touches[0].clientX - touchStartXRef.current
+    const dy = e.touches[0].clientY - touchStartYRef.current
+    // Only track horizontal swipes (ignore vertical scrolling)
+    if (Math.abs(dx) > Math.abs(dy)) {
+      swipeOffsetRef.current = dx
+      const el = nodeRef.current
+      if (el) {
+        const base =
+          baseTransformRef.current !== 'none'
+            ? `${baseTransformRef.current} `
+            : ''
+        el.style.transform = `${base}translateX(${dx}px)`
+        el.style.opacity = `${Math.max(0, 1 - Math.abs(dx) / (SWIPE_THRESHOLD * 2))}`
+        el.style.transition = 'none'
+      }
+    }
+  }
+
+  const handleTouchEnd = () => {
+    touchActiveRef.current = false
+    const offset = swipeOffsetRef.current
+    const el = nodeRef.current
+    swipeOffsetRef.current = 0
+
+    if (Math.abs(offset) >= SWIPE_THRESHOLD) {
+      // Animate off-screen in swipe direction, then dismiss
+      if (el) {
+        const base =
+          baseTransformRef.current !== 'none'
+            ? `${baseTransformRef.current} `
+            : ''
+        const direction = offset > 0 ? '100vw' : '-100vw'
+        el.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out'
+        el.style.transform = `${base}translateX(${direction})`
+        el.style.opacity = '0'
+      }
+      setTimeout(() => {
+        if (el) {
+          el.style.transform = ''
+          el.style.opacity = ''
+          el.style.transition = ''
+        }
+        if (pendingOnlineRef.current !== null) {
+          enterNotification(pendingOnlineRef.current)
+        } else {
+          setPhase('hidden')
+        }
+      }, 200)
+    } else if (el) {
+      // Snap back smoothly
+      el.style.transition = 'transform 150ms ease, opacity 150ms ease'
+      requestAnimationFrame(() => {
+        if (el) {
+          el.style.transform = ''
+          el.style.opacity = ''
+        }
+        setTimeout(() => {
+          if (el) el.style.transition = ''
+        }, 150)
+      })
+    }
+  }
+
   if (shouldDestroyOnClose && phase === 'hidden') return null
 
   const phaseClass =
@@ -202,6 +286,7 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   return (
     <div
+      ref={nodeRef}
       role="status"
       aria-live="polite"
       className={classNames(
@@ -213,8 +298,13 @@ const OnlineStatusNotificationComponent = forwardRef<
       )}
       style={style}
       onTransitionEnd={handleTransitionEnd}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onPointerEnter={() => setHovering(true)}
+      onPointerLeave={() => {
+        if (!touchActiveRef.current) setHovering(false)
+      }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="statusNotificationIcon">
         {displayedOnline ? onlineIcon : offlineIcon}
