@@ -1,4 +1,12 @@
-## React Network Status Notification (React-nsn) [![License](https://img.shields.io/npm/l/react-nsn)](https://github.com/AmrAhmedA/react-nsn/blob/main/LICENSE) ![npm](https://img.shields.io/npm/dm/react-nsn)
+## React Network Status Notification (React-nsn)
+
+[![npm version](https://img.shields.io/npm/v/react-nsn)](https://www.npmjs.com/package/react-nsn)
+[![npm downloads](https://img.shields.io/npm/dm/react-nsn)](https://www.npmjs.com/package/react-nsn)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/react-nsn)](https://bundlephobia.com/package/react-nsn)
+[![CI](https://github.com/AmrAhmedA/react-nsn/actions/workflows/checks.yml/badge.svg)](https://github.com/AmrAhmedA/react-nsn/actions/workflows/checks.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue)](https://www.npmjs.com/package/react-nsn)
+[![zero dependencies](https://img.shields.io/badge/dependencies-0-green)](https://www.npmjs.com/package/react-nsn)
+[![License](https://img.shields.io/npm/l/react-nsn)](https://github.com/AmrAhmedA/react-nsn/blob/main/LICENSE)
 
 
 
