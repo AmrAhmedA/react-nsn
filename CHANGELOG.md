@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.4.4
+
+### Chores
+
+- Upgrade `eslint-plugin-react-hooks` v5 → v7 (explicit rules only, no React Compiler rules)
+- Fix high-severity minimatch vulnerability via npm overrides
+- Remove unused dev dependencies: `rollup-plugin-visualizer`, `process`, `@typescript-eslint/eslint-plugin`, `@typescript-eslint/parser`
+
 ## 2.4.3
 
 ### Internal
