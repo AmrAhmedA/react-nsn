@@ -1,35 +1,22 @@
 export function timeSince(date: Date) {
   const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
 
-  let interval = seconds / 31536000
+  const intervals: [number, string][] = [
+    [31536000, 'year'],
+    [2592000, 'month'],
+    [86400, 'day'],
+    [3600, 'hour'],
+    [60, 'minute'],
+  ]
 
-  if (interval > 1) {
-    return Math.floor(interval) + ' years'
-  }
-  interval = seconds / 2592000
-  if (interval > 1) {
-    return Math.floor(interval) + ' months'
-  }
-  interval = seconds / 86400
-  if (interval > 1) {
-    return Math.floor(interval) + ' days'
-  }
-  interval = seconds / 3600
-  if (interval > 1) {
-    return Math.floor(interval) + ' hours'
+  for (const [divisor, unit] of intervals) {
+    const value = Math.floor(seconds / divisor)
+    if (value >= 1) {
+      return `${value} ${unit}${value === 1 ? '' : 's'}`
+    }
   }
 
-  interval = seconds / 60
-
-  if (interval > 2) {
-    return Math.floor(interval) + ' minutes'
-  }
-
-  if (interval > 1) {
-    return Math.floor(interval) + ' minute'
-  }
-
-  return Math.floor(seconds) + ' seconds'
+  return `${seconds} second${seconds === 1 ? '' : 's'}`
 }
 
 export const DEFAULT_POLLING_URL = 'https://www.gstatic.com/generate_204'

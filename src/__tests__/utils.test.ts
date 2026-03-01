@@ -40,7 +40,7 @@ describe('timeSince', () => {
 
   it('returns years for dates over a year ago', () => {
     const date = new Date(Date.now() - 400 * 86400 * 1000)
-    expect(timeSince(date)).toBe('1 years')
+    expect(timeSince(date)).toBe('1 year')
   })
 
   it('handles future dates gracefully (returns 0 seconds)', () => {
