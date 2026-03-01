@@ -252,6 +252,31 @@ describe('useInterval', () => {
     expect(callback).not.toHaveBeenCalled()
   })
 
+  it('fires immediately when delay transitions from null to a number', async () => {
+    const callback = vi.fn().mockResolvedValue(undefined)
+
+    const { rerender } = renderHook(
+      ({ delay }) => useInterval(callback, delay),
+      { initialProps: { delay: null as number | null } },
+    )
+
+    // Should not have been called while paused
+    expect(callback).not.toHaveBeenCalled()
+
+    // Resume with a delay
+    rerender({ delay: 1000 })
+
+    // Should fire immediately on resume
+    expect(callback).toHaveBeenCalledTimes(1)
+
+    // And continue at the interval
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+
+    expect(callback).toHaveBeenCalledTimes(2)
+  })
+
   it('cleans up interval on unmount', async () => {
     const callback = vi.fn().mockResolvedValue(undefined)
 

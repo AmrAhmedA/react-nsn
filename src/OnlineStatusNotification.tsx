@@ -5,6 +5,13 @@ import React, {
   useRef,
   useState,
 } from 'react'
+import {
+  DEFAULT_OFFLINE_TEXT,
+  DEFAULT_ONLINE_TEXT,
+  SWIPE_ANIMATION_MS,
+  SWIPE_THRESHOLD,
+  TRANSITION_FALLBACK_MS,
+} from './constants'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
 import './notification.css'
 
@@ -47,10 +54,8 @@ export interface OnlineStatusNotificationProps {
 
 type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
 
-const DEFAULT_ONLINE_TEXT = 'Your internet connection was restored.'
-const DEFAULT_OFFLINE_TEXT = 'You are currently offline.'
-const TRANSITION_FALLBACK_MS = 400
-const SWIPE_THRESHOLD = 80
+
+let hasWarnedDestoryOnClose = false
 
 /**
  * The notification component will pop up when the network status becomes offline and will popup once again when it goes back online
@@ -94,6 +99,15 @@ const OnlineStatusNotificationComponent = forwardRef<
     style,
   } = props
 
+  if (!hasWarnedDestoryOnClose && destoryOnClose !== undefined) {
+    if (process.env.NODE_ENV !== 'production') {
+      hasWarnedDestoryOnClose = true
+      console.warn(
+        'react-nsn: `destoryOnClose` is deprecated and will be removed in a future release. Use `destroyOnClose` instead.',
+      )
+    }
+  }
+
   const shouldDestroyOnClose = destroyOnClose ?? destoryOnClose ?? true
 
   const [phase, setPhase] = useState<Phase>('hidden')
@@ -115,6 +129,13 @@ const OnlineStatusNotificationComponent = forwardRef<
   const baseTransformRef = useRef('')
 
   const isVisible = phase === 'visible'
+
+  useEffect(() => {
+    if (phase === 'visible' && nodeRef.current) {
+      baseTransformRef.current =
+        window.getComputedStyle(nodeRef.current).transform
+    }
+  }, [phase])
 
   const enterNotification = useCallback((online: boolean) => {
     setDisplayedOnline(online)
@@ -205,10 +226,6 @@ const OnlineStatusNotificationComponent = forwardRef<
     touchStartXRef.current = e.touches[0].clientX
     touchStartYRef.current = e.touches[0].clientY
     swipeOffsetRef.current = 0
-    const el = nodeRef.current
-    if (el) {
-      baseTransformRef.current = window.getComputedStyle(el).transform
-    }
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -244,7 +261,7 @@ const OnlineStatusNotificationComponent = forwardRef<
             ? `${baseTransformRef.current} `
             : ''
         const direction = offset > 0 ? '100vw' : '-100vw'
-        el.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out'
+        el.style.transition = `transform ${SWIPE_ANIMATION_MS}ms ease-out, opacity ${SWIPE_ANIMATION_MS}ms ease-out`
         el.style.transform = `${base}translateX(${direction})`
         el.style.opacity = '0'
       }
@@ -259,7 +276,7 @@ const OnlineStatusNotificationComponent = forwardRef<
         } else {
           setPhase('hidden')
         }
-      }, 200)
+      }, SWIPE_ANIMATION_MS)
     } else if (el) {
       // Snap back smoothly
       el.style.transition = 'transform 150ms ease, opacity 150ms ease'
