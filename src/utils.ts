@@ -18,5 +18,3 @@ export function timeSince(date: Date) {
 
   return `${seconds} second${seconds === 1 ? '' : 's'}`
 }
-
-export const DEFAULT_POLLING_URL = 'https://www.gstatic.com/generate_204'

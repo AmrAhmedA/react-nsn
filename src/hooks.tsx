@@ -6,7 +6,8 @@ import {
   useRef,
   useState,
 } from 'react'
-import { DEFAULT_POLLING_URL, timeSince } from './utils'
+import { DEFAULT_POLLING_URL } from './constants'
+import { timeSince } from './utils'
 
 const isBrowser = typeof window !== 'undefined'
 
@@ -146,15 +147,13 @@ export function useOnlineStatus({
   useEffect(() => {
     if (isBrowser) {
       const onVisibilityChange = () => {
-        const visible = !document.hidden
-        setTabVisible(visible)
-        if (visible) checkStatus()
+        setTabVisible(!document.hidden)
       }
       document.addEventListener('visibilitychange', onVisibilityChange)
       return () =>
         document.removeEventListener('visibilitychange', onVisibilityChange)
     }
-  }, [checkStatus])
+  }, [])
 
   useInterval(checkStatus, tabVisible ? effectiveDelay : null)
 
@@ -218,17 +217,22 @@ export function useInterval(
   delay: number | null,
 ) {
   const savedCallback = useRef<(() => Promise<void>) | null>(null)
+  const prevDelayRef = useRef<number | null>(delay)
 
   useEffect(() => {
     savedCallback.current = callback
   }, [callback])
 
   useEffect(() => {
+    const wasNull = prevDelayRef.current === null
+    prevDelayRef.current = delay
+
     function tick() {
       savedCallback.current?.()
     }
 
     if (delay !== null) {
+      if (wasNull) tick()
       const id = setInterval(tick, delay)
       return () => clearInterval(id)
     }

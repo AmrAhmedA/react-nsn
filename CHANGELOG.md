@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.5.0
+
+### Fixes
+
+- Fix example app reducer default `duration: 4.5` → `4500` (notification vanished instantly on state reset)
+- Fix swipe animation timing mismatch: extract hardcoded `200ms` to `SWIPE_ANIMATION_MS` constant shared between inline transition and setTimeout
+
+### Improvements
+
+- Deduplicate network check on tab resume: `useInterval` now fires immediately when delay transitions from `null` to a number, removing redundant `checkStatus()` call from visibility handler
+- Cache `getComputedStyle` for touch handling: capture base transform once on phase `'visible'` instead of on every `touchstart`
+- Add dev-mode deprecation warning when `destoryOnClose` prop is used
+
+### Internal
+
+- Extract all module-level constants into `src/constants.ts`
+- Add `useInterval` resume-fire test
+- Add `destoryOnClose` deprecation warning test
+
 ## 2.4.4
 
 ### Chores

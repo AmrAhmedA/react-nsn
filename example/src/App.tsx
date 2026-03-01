@@ -70,7 +70,7 @@ function reducer(state: State, action: ReducerActions) {
       newState = {
         position: 'bottomLeft',
         darkMode: true,
-        duration: 4.5,
+        duration: 4500,
         statusText: {
           online: `Your internet connection was restored.`,
           offline: `You are currently offline.`

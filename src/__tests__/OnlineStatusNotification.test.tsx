@@ -132,6 +132,22 @@ describe('OnlineStatusNotification', () => {
     })
   })
 
+  describe('deprecation warning', () => {
+    it('warns in dev mode when destoryOnClose is used', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      render(
+        <OnlineStatusNotification isOnline={false} destoryOnClose={true} />,
+      )
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('`destoryOnClose` is deprecated'),
+      )
+
+      warnSpy.mockRestore()
+    })
+  })
+
   describe('destroyOnClose', () => {
     it('renders notification in DOM when destroyOnClose is true and visible', () => {
       const { container } = render(
