@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.5.2
+
+### Fixes
+
+- Resolve high-severity minimatch ReDoS vulnerability in `@microsoft/api-extractor` via npm override (`^10.2.3`)
+- Fix example app React types mismatch (`@types/react` 18 → 19) that broke demo site build
+
 ## 2.5.1
 
 ### Chores
