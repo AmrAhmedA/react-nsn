@@ -1,8 +1,7 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig, type PluginOption } from 'vite'
+import { defineConfig } from 'vite'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import dts from 'vite-plugin-dts'
 import packageJson from './package.json' with { type: 'json' }
@@ -30,13 +29,6 @@ export default defineConfig({
       insertTypesEntry: true,
       rollupTypes: true,
     }),
-    visualizer({
-      template: 'treemap',
-      open: true,
-      gzipSize: true,
-      brotliSize: true,
-      filename: 'analyse.html',
-    }) as PluginOption,
   ],
 
   build: {
