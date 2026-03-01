@@ -1,5 +1,77 @@
 # Changelog
 
+## 2.4.2
+
+### Chores
+
+- Improve npm discoverability: add high-traffic keywords, shorten package description
+
+## 2.4.1
+
+### Chores
+
+- Upgrade dev dependencies: React 19, Vite 7, @types/node 25, lint-staged 16.3
+- Remove unused `@types/jest`
+- Update vitest triple-slash directive to `vitest/config`
+
+## 2.4.0
+
+### Features
+
+- Swipe-to-dismiss on mobile (horizontal swipe with threshold detection)
+- Pause auto-hide on hover/pointer interaction
+- Accessible close and refresh buttons (`<button>` elements with `aria-label`)
+
+## 2.3.0
+
+### Features
+
+- Headless mode: import from `react-nsn/headless` for hook-only usage (~1.4KB gzipped)
+- Typed imperative ref with `openStatus()` and `dismiss()` methods
+- Exponential backoff for polling when offline (capped at 60s)
+- Custom `pollingFn` option for user-defined connectivity checks
+- `className` and `style` props for notification customization
+- `onStatusChange` callback fired on status changes
+
+### Fixes
+
+- Hook correctness fixes: proper effect cleanup, stable callback refs
+
+### Docs
+
+- Updated README with headless mode and new API documentation
+
+## 2.2.0
+
+### Features
+
+- Improved `useOnlineStatus` hook API: `isOffline`, `checkNow()`, `time.difference`, `connectionInfo`
+- Improved component props: `destroyOnClose`, `eventsCallback`
+
+## 2.1.2
+
+### Fixes
+
+- Remove duplicate polling on mount
+- Add CSS transition fallback timer for reliable exit animations
+
+### Chores
+
+- Add automated release workflow in CI
+
+## 2.1.0
+
+### Features
+
+- Accessibility: `role="status"` and `aria-live="polite"` on notification container
+- Strict mode compatibility
+- Test suite with vitest and @testing-library/react
+- CI checks workflow
+
+### Fixes
+
+- Resolve dual React instance in example app
+
 ## 2.0.0
 
 ### Breaking Changes
