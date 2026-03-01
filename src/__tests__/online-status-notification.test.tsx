@@ -1,8 +1,8 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import type { OnlineStatusNotificationRef } from '../OnlineStatusNotification'
-import OnlineStatusNotification from '../OnlineStatusNotification'
+import type { OnlineStatusNotificationRef } from '../online-status-notification'
+import OnlineStatusNotification from '../online-status-notification'
 
 describe('OnlineStatusNotification', () => {
   describe('rendering', () => {
