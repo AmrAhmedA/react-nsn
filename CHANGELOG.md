@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.4.3
+
+### Internal
+
+- Rename `App.css` to `notification.css`
+- Normalize internal identifiers in hooks (`checkStatus`, `isBrowser`, `hasNavigator`, etc.)
+- Use `SCREAMING_SNAKE_CASE` for module-level constants
+- Fix `timeSince` singular/plural for all time units (e.g. "1 year" instead of "1 years")
+- Fix JSDoc referencing wrong component name
+- Inline `useOnlineStatus` export
+
 ## 2.4.2
 
 ### Chores
