@@ -5,8 +5,8 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import './notification.css'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
+import './notification.css'
 
 export type StatusText = {
   online?: string
