@@ -8,12 +8,12 @@ import {
 } from 'react'
 import { DEFAULT_POLLING_URL, timeSince } from './utils'
 
-const isWindowDocumentAvailable = typeof window !== 'undefined'
+const isBrowser = typeof window !== 'undefined'
 
-const isNavigatorObjectAvailable = typeof navigator !== 'undefined'
+const hasNavigator = typeof navigator !== 'undefined'
 
 function getConnectionInfo(): NetworkInformation | null {
-  if (isNavigatorObjectAvailable) {
+  if (hasNavigator) {
     const nav: Navigator & {
       connection?: NetworkInformation
       mozConnection?: NetworkInformation
@@ -31,29 +31,29 @@ type OnlineStatusProps = {
   onStatusChange?: (isOnline: boolean) => void
 }
 
-const InitialOnlineStatus = isNavigatorObjectAvailable ? navigator.onLine : true
+const InitialOnlineStatus = hasNavigator ? navigator.onLine : true
 
-type ReducerActionTypes = 'offline' | 'online'
-type ReducerActions = {
-  type: ReducerActionTypes
+type StatusActionType = 'offline' | 'online'
+type StatusAction = {
+  type: StatusActionType
 }
 
 type State = {
   online: boolean
   time: {
     since: Date
-    diff: string
+    difference: string
   }
 }
 
-function statusReducer(prevState: State, action: ReducerActions): State {
+function statusReducer(prevState: State, action: StatusAction): State {
   switch (action.type) {
     case 'offline': {
       const since = prevState.online ? new Date() : prevState.time.since
       return {
         ...prevState,
         online: false,
-        time: { since, diff: timeSince(since) },
+        time: { since, difference: timeSince(since) },
       }
     }
     case 'online': {
@@ -61,7 +61,7 @@ function statusReducer(prevState: State, action: ReducerActions): State {
       return {
         ...prevState,
         online: true,
-        time: { since, diff: timeSince(since) },
+        time: { since, difference: timeSince(since) },
       }
     }
     default:
@@ -97,17 +97,17 @@ type OnlineStatusResult = {
   time: { since: Date; difference: string }
 }
 
-function useOnlineStatus({
+export function useOnlineStatus({
   pollingUrl = DEFAULT_POLLING_URL,
   pollingDuration = 12000,
   pollingFn,
   onStatusChange,
 }: OnlineStatusProps = {}): OnlineStatusResult {
-  const [statusState, dispatch] = useReducer(statusReducer, {
+  const [status, dispatch] = useReducer(statusReducer, {
     online: InitialOnlineStatus,
     time: {
       since: new Date(),
-      diff: timeSince(new Date()),
+      difference: timeSince(new Date()),
     },
   })
 
@@ -118,7 +118,7 @@ function useOnlineStatus({
 
   const [effectiveDelay, setEffectiveDelay] = useState(pollingDuration)
 
-  const _onlineStatusFn = useCallback(async () => {
+  const checkStatus = useCallback(async () => {
     try {
       if (pollingFnRef.current) {
         const online = await pollingFnRef.current()
@@ -140,47 +140,47 @@ function useOnlineStatus({
   }, [pollingUrl, pollingDuration])
 
   const [tabVisible, setTabVisible] = useState(
-    isWindowDocumentAvailable ? !document.hidden : true,
+    isBrowser ? !document.hidden : true,
   )
 
   useEffect(() => {
-    if (isWindowDocumentAvailable) {
+    if (isBrowser) {
       const onVisibilityChange = () => {
         const visible = !document.hidden
         setTabVisible(visible)
-        if (visible) _onlineStatusFn()
+        if (visible) checkStatus()
       }
       document.addEventListener('visibilitychange', onVisibilityChange)
       return () =>
         document.removeEventListener('visibilitychange', onVisibilityChange)
     }
-  }, [_onlineStatusFn])
+  }, [checkStatus])
 
-  useInterval(_onlineStatusFn, tabVisible ? effectiveDelay : null)
+  useInterval(checkStatus, tabVisible ? effectiveDelay : null)
 
-  const handleOnlineStatus = useCallback(
+  const handleNetworkChange = useCallback(
     ({ type }: Event) => {
       if (type === 'online') {
-        _onlineStatusFn()
+        checkStatus()
       } else {
         dispatch({ type: 'offline' })
       }
     },
-    [_onlineStatusFn],
+    [checkStatus],
   )
 
   // Reactive logic for detecting browser side online/offline
   useEffect(() => {
-    if (isWindowDocumentAvailable) {
-      window.addEventListener('online', handleOnlineStatus)
-      window.addEventListener('offline', handleOnlineStatus)
+    if (isBrowser) {
+      window.addEventListener('online', handleNetworkChange)
+      window.addEventListener('offline', handleNetworkChange)
 
       return () => {
-        window.removeEventListener('online', handleOnlineStatus)
-        window.removeEventListener('offline', handleOnlineStatus)
+        window.removeEventListener('online', handleNetworkChange)
+        window.removeEventListener('offline', handleNetworkChange)
       }
     }
-  }, [handleOnlineStatus])
+  }, [handleNetworkChange])
 
   // Fire onStatusChange callback when status changes (skip initial render)
   const onStatusChangeRef = useRef(onStatusChange)
@@ -192,16 +192,16 @@ function useOnlineStatus({
       isInitialRenderRef.current = false
       return
     }
-    onStatusChangeRef.current?.(statusState.online)
-  }, [statusState.online])
+    onStatusChangeRef.current?.(status.online)
+  }, [status.online])
 
   return {
-    attributes: { isOnline: statusState.online },
-    checkNow: _onlineStatusFn,
+    attributes: { isOnline: status.online },
+    checkNow: checkStatus,
     connectionInfo,
-    isOffline: !statusState.online,
-    isOnline: statusState.online,
-    time: { since: statusState.time.since, difference: statusState.time.diff },
+    isOffline: !status.online,
+    isOnline: status.online,
+    time: { since: status.time.since, difference: status.time.difference },
   }
 }
 
@@ -235,7 +235,6 @@ export function useInterval(
   }, [delay])
 }
 
-export { useOnlineStatus }
 export type { OnlineStatusResult }
 
 type Megabit = number

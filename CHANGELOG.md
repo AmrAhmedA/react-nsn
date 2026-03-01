@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.4.4
+
+### Chores
+
+- Upgrade `eslint-plugin-react-hooks` v5 → v7 (explicit rules only, no React Compiler rules)
+- Fix high-severity minimatch vulnerability in ESLint via npm override
+- Remove unused dev dependencies: `rollup-plugin-visualizer`, `process`, `@typescript-eslint/eslint-plugin`, `@typescript-eslint/parser`
+
+## 2.4.3
+
+### Internal
+
+- Rename `App.css` to `notification.css`
+- Normalize internal identifiers in hooks (`checkStatus`, `isBrowser`, `hasNavigator`, etc.)
+- Use `SCREAMING_SNAKE_CASE` for module-level constants
+- Fix `timeSince` singular/plural for all time units (e.g. "1 year" instead of "1 years")
+- Fix JSDoc referencing wrong component name
+- Inline `useOnlineStatus` export
+
 ## 2.4.2
 
 ### Chores

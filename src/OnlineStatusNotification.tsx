@@ -5,8 +5,8 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import './App.css'
 import { closeIcon, offlineIcon, onlineIcon } from './icons'
+import './notification.css'
 
 export type StatusText = {
   online?: string
@@ -47,8 +47,8 @@ export interface OnlineStatusNotificationProps {
 
 type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
 
-const DefaultOnlineText = 'Your internet connection was restored.'
-const DefaultOfflineText = 'You are currently offline.'
+const DEFAULT_ONLINE_TEXT = 'Your internet connection was restored.'
+const DEFAULT_OFFLINE_TEXT = 'You are currently offline.'
 const TRANSITION_FALLBACK_MS = 400
 const SWIPE_THRESHOLD = 80
 
@@ -60,7 +60,7 @@ const SWIPE_THRESHOLD = 80
  * function App() {
  *   const { attributes } = useOnlineStatus()
  *
- *   return <OnlineStatusNotifier {...attributes} />
+ *   return <OnlineStatusNotification {...attributes} />
  * }
  *
  * ```
@@ -344,7 +344,7 @@ export default OnlineStatusNotification
 
 const getStatusText = (isOnline: boolean, statusText: StatusText): string =>
   isOnline
-    ? (statusText?.online ?? DefaultOnlineText)
-    : (statusText?.offline ?? DefaultOfflineText)
+    ? (statusText?.online ?? DEFAULT_ONLINE_TEXT)
+    : (statusText?.offline ?? DEFAULT_OFFLINE_TEXT)
 
 const classNames = (...classes: string[]) => classes.filter(Boolean).join(' ')
