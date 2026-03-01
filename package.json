@@ -127,11 +127,6 @@
   "overrides": {
     "eslint": {
       "minimatch": "^9.0.0"
-    },
-    "vite-plugin-dts": {
-      "@microsoft/api-extractor": {
-        "minimatch": "^10.2.3"
-      }
     }
   }
 }
