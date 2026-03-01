@@ -54,7 +54,6 @@ export interface OnlineStatusNotificationProps {
 
 type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
 
-
 let hasWarnedDestoryOnClose = false
 
 /**
@@ -132,8 +131,9 @@ const OnlineStatusNotificationComponent = forwardRef<
 
   useEffect(() => {
     if (phase === 'visible' && nodeRef.current) {
-      baseTransformRef.current =
-        window.getComputedStyle(nodeRef.current).transform
+      baseTransformRef.current = window.getComputedStyle(
+        nodeRef.current,
+      ).transform
     }
   }, [phase])
 
