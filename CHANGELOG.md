@@ -4,7 +4,7 @@
 
 ### Chores
 
-- Rename `OnlineStatusNotification.tsx` and its test to kebab-case to match the rest of `src/`
+- Rename `OnlineStatusNotification.tsx` → `network-status-notification.tsx` (and test) to match kebab-case convention in `src/`
 
 ## 2.5.0
 
