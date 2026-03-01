@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.1
+
+### Chores
+
+- Rename `OnlineStatusNotification.tsx` and its test to kebab-case to match the rest of `src/`
+
 ## 2.5.0
 
 ### Fixes
